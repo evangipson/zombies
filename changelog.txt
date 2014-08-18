@@ -1,0 +1,6 @@
+0.03
+completed map drawing and scrolling
+
+0.04
+moved global variables to constants file
+created options screen
