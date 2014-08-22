@@ -4,3 +4,7 @@ completed map drawing and scrolling
 0.04
 moved global variables to constants file
 created options screen
+
+0.05
+fixed options screen and back button
+added sensitivity scroller to options

@@ -140,7 +140,10 @@ function scene:show( event )
     if ( phase == "will" ) then
         --we position elements here, because we are
         --re-entering the scene
-
+		if constants.scrollSpeed == nil then
+			constants.scrollSpeed = 0.05
+		end
+		display.setDefault( "background", 0, 0, 0 )
         --"did" fires when the scene is FULLY
         --on the screen.
     elseif ( phase == "did" ) then
@@ -153,6 +156,7 @@ function scene:show( event )
             --world[i]:addEventListener("touch",getInfo)
         end
         print("In game.")
+		print("Scrollspeed: ",constants.scrollSpeed)
     end
 end
 

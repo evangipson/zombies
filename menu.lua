@@ -19,7 +19,6 @@ local function handleOptionsEvent( event )
     if ( "ended" == event.phase ) then
 		-- Assumes that "menu.lua" exists and is configured as a Composer scene
 		--?? do i need to remove this every time? if i don't, it doesn't go through the create thing and make buttons again...
-		composer.removeScene("options")
 		composer.gotoScene( "options" )
     end
 end
@@ -33,42 +32,8 @@ function scene:create( event )
 	
 	-- Load menu audio loop
 	menuLoop = audio.loadStream( "spy.mp3" )
+	display.setDefault( "background", 1, 1, 1 )
 
-	-- Create the start button
-	startButton = widget.newButton
-	{
-		label = "button",
-		onEvent = handleStartEvent,
-		emboss = false,
-		--properties for a rounded rectangle button...
-		shape="roundedRect",
-		width = 200,
-		height = 40,
-		cornerRadius = 2,
-		fillColor = { default={ 1, 1, 1, 1 }, over={ 1, 1, 1, 0.4 } },
-		strokeColor = { default={ 1, 0.4, 0, 1 }, over={ 0.8, 0.8, 1, 1 } },
-		strokeWidth = 0
-	}
-	
-		-- create the options button
-	optionsButton = widget.newButton
-	{
-		label = "button",
-		onEvent = handleOptionsEvent,
-		emboss = false,
-		--properties for a rounded rectangle button...
-		shape="roundedRect",
-		width = 200,
-		height = 40,
-		cornerRadius = 2,
-		fillColor = { default={ 1, 1, 1, 1 }, over={ 1, 1, 1, 0.4 } },
-		strokeColor = { default={ 1, 0.4, 0, 1 }, over={ 0.8, 0.8, 1, 1 } },
-		strokeWidth = 0
-	}
-	--show the title
-	title = display.newText( "Spy!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
-	title:setFillColor( 1, 1, 1 )
-	
 
 	
 	--========
@@ -79,8 +44,6 @@ function scene:create( event )
 	
 	--get our scene view
     local sceneGroup = self.view
-	sceneGroup:insert(startButton)
-	sceneGroup:insert(optionsButton)
     
 end
 
@@ -94,6 +57,47 @@ function scene:show( event )
 		--we position elements here, because we are 
 		--re-entering the scene
 		
+			-- Create the start button
+	startButton = widget.newButton
+	{
+		label = "button",
+		onEvent = handleStartEvent,
+		emboss = false,
+		--properties for a rounded rectangle button...
+		shape="roundedRect",
+		width = 200,
+		height = 40,
+		cornerRadius = 10,
+		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+		strokeWidth = 2
+	}
+	
+
+	--show the title
+	title = display.newText( "Zombies!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
+	title:setFillColor( 0, 0, 0 )
+	
+		
+				-- create the options button
+	optionsButton = widget.newButton
+	{
+		label = "button",
+		onEvent = handleOptionsEvent,
+		emboss = false,
+		--properties for a rounded rectangle button...
+		shape="roundedRect",
+		width = 200,
+		height = 40,
+		cornerRadius = 10,
+		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+		strokeWidth = 2
+	}
+		
+		
 		-- Center the buttons
 		startButton.x = display.contentCenterX
 		startButton.y = display.contentCenterY-40
@@ -102,8 +106,12 @@ function scene:show( event )
 		-- Change the button's label text
 		startButton:setLabel( "Start" )
 		optionsButton:setLabel( "Options" )
+		sceneGroup:insert(startButton)
+	sceneGroup:insert(optionsButton)
 	--"did" fires when the scene is FULLY
 	--on the screen.
+		
+	
     elseif ( phase == "did" ) then
 		--start runtime listeners like "enterFrame"
 		--start timers, transitions, sprite animations.
