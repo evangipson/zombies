@@ -56,8 +56,12 @@ function scene:show( event )
     if ( phase == "will" ) then
 		--we position elements here, because we are 
 		--re-entering the scene
-		
-			-- Create the start button
+	
+	--show the title
+	title = display.newText( "Zombies!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
+	title:setFillColor( 0, 0, 0 )	
+				
+	-- Create the start button
 	startButton = widget.newButton
 	{
 		label = "button",
@@ -74,13 +78,7 @@ function scene:show( event )
 		strokeWidth = 2
 	}
 	
-
-	--show the title
-	title = display.newText( "Zombies!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
-	title:setFillColor( 0, 0, 0 )
-	
-		
-				-- create the options button
+	-- create the options button
 	optionsButton = widget.newButton
 	{
 		label = "button",
@@ -106,12 +104,13 @@ function scene:show( event )
 		-- Change the button's label text
 		startButton:setLabel( "Start" )
 		optionsButton:setLabel( "Options" )
-		sceneGroup:insert(startButton)
-	sceneGroup:insert(optionsButton)
-	--"did" fires when the scene is FULLY
-	--on the screen.
-		
 	
+
+	sceneGroup:insert(startButton)
+	sceneGroup:insert(optionsButton)
+	
+	--"did" fires when the scene is FULLY
+	--on the screen.		
     elseif ( phase == "did" ) then
 		--start runtime listeners like "enterFrame"
 		--start timers, transitions, sprite animations.
