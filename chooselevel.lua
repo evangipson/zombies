@@ -9,7 +9,8 @@ local levelpic={}
 local levelTitle={}
 local moveImages
 
---?? i don't know if we can do this in a loop with concatenating i to "level" and ".png"
+--??i don't know if we can do this in a loop with concatenating i to "level" and ".png"
+--!!need to add infinite mode here too
 imageArray[1]="level0.png"
 imageArray[2]="level1.png"
 imageArray[3]="level2.png"
@@ -33,6 +34,7 @@ levelTitle[8] = "Pandemic"
 levelTitle[9] = "Onslaught"
 levelTitle[10] = "Epidemic"
 levelTitle[11] = "Apocalypse"
+
 --==============
 --USER FUNCTIONS
 --==============
@@ -59,7 +61,9 @@ end
 
 local function clickLevel( event )
 	constants.currentLevel = event.target.name
-	composer.gotoScene( "game" )
+	if event.target.alpha == 1 then
+		composer.gotoScene( "game" )
+	end
 end
 
 --===============
@@ -71,6 +75,7 @@ function scene:create( event )
 	
 	-- Load menu audio loop
 	menuLoop = audio.loadStream( "spy.mp3" )
+	--!!change this color after we change the level images
 	display.setDefault( "background", 0, 1, 1 )
 	
 	--========
@@ -95,11 +100,13 @@ function scene:show( event )
 	--re-entering the scene
 	title = display.newText("Choose level", display.contentCenterX, display.contentCenterY-(display.contentHeight/2)+40)
 	title:setFillColor( 0, 0, 0)
+	--add tutorial pic
 	levelpic[1] = display.newImage(imageArray[1], display.contentCenterX, display.contentCenterY)
 	nameArray[1] = display.newText(levelTitle[1], display.contentCenterX, display.contentCenterY+80)
 	nameArray[1]:setFillColor( 0, 0, 0)
 	levelpic[1]:addEventListener( "tap", clickLevel )
 	levelpic[1].name = 0
+	--add the other level pics
 	for i = 2, 11 do
 		--??need to fix the "i*X" thing here to make sure it covers all resolutions. or do we?
 		levelpic[i] = display.newImage( imageArray[i], (display.contentCenterX+i*150)-150, display.contentCenterY)
@@ -107,7 +114,12 @@ function scene:show( event )
 		levelpic[i].name = i-1
 		nameArray[i] = display.newText( levelTitle[i], (display.contentCenterX+i*150)-150, display.contentCenterY+80)
 		nameArray[i]:setFillColor( 0, 0, 0)
-	end
+		--grey them out if user is not yet at that level
+		if constants.levelCleared[i-1] == "false" then
+			levelpic[i].alpha = 0.4
+			nameArray[i].alpha = 0.4
+		end
+	end	
 	
 	Runtime:addEventListener( "touch" , moveImages)
 	--"did" fires when the scene is FULLY
@@ -131,6 +143,7 @@ function scene:hide( event )
 		--unallocate timers, transitions, sprite stuff.
 		for i = 1,11 do
 			levelpic[i]:removeSelf()
+			nameArray[i]:removeSelf()
 		end
 		Runtime:removeEventListener( "touch" , moveImages)
 		--clean up audio variables

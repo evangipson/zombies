@@ -17,15 +17,14 @@ local roomH={}
 --1) initial room creation
 --2) everytime the player chooses to leave a room
 function detectLevel()
-	--check which level player is on and set variables accordingly
+	--check which level player is on and set room variables accordingly
 	if constants.currentLevel == 0 then
-		roomCount = 4
+		roomCount = #constants.level0RoomX
 		for i=1,roomCount do
 			roomX[i] = constants.level0RoomX[i]
 			roomY[i] = constants.level0RoomY[i]
 			roomW[i] = constants.level0RoomW[i]
 			roomH[i] = constants.level0RoomH[i]
-			print(roomX[i])
 		end
 	end
 	if constants.currentLevel == 1 then

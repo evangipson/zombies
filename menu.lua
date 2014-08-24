@@ -25,6 +25,60 @@ local function handleOptionsEvent( event )
     end
 end
 
+local function loadGame()
+	--to track which line of the file we're reading
+	local lineNumber = 1
+	--open the save file
+	local file = io.open( constants.saveFile, "r")
+	for line in file:lines() do
+		--scrollSpeed is on the first line so read that first
+		if lineNumber == 1 then
+			constants.scrollSpeed = line
+		end
+		--then a boolean showing if you cleared levels 1-10
+		if lineNumber == 2 then
+			constants.levelCleared[1] = line
+		end
+		if lineNumber == 3 then
+			constants.levelCleared[2] = line
+		end
+		if lineNumber == 4 then
+			constants.levelCleared[3] = line
+		end
+		if lineNumber == 5 then
+			constants.levelCleared[4] = line
+		end
+		if lineNumber == 6 then
+			constants.levelCleared[5] = line
+		end
+		if lineNumber == 7 then
+			constants.levelCleared[6] = line
+		end
+		if lineNumber == 8 then
+			constants.levelCleared[7] = line
+		end
+		if lineNumber == 9 then
+			constants.levelCleared[8] = line
+		end
+		if lineNumber == 10 then
+			constants.levelCleared[9] = line
+		end
+		if lineNumber == 11 then
+			constants.levelCleared[10] = line
+		end
+		lineNumber = lineNumber + 1
+	end
+	io.close(file)
+	--if there's no scrollSpeed in the save file (i.e. new save), set it to 0.05 (default)
+	if constants.scrollSpeed == nil then
+		constants.scrollSpeed = 0.05
+	end
+	--!!add somewhere to see if levels are cleared and unlock the next one etc
+--	for i=1,10 do
+--		print(constants.levelCleared[i])
+--	end
+end
+
 --===============
 --SCENE FUNCTIONS
 --===============
@@ -35,14 +89,6 @@ function scene:create( event )
 	-- Load menu audio loop
 	menuLoop = audio.loadStream( "spy.mp3" )
 	display.setDefault( "background", 1, 1, 1 )
-
-
-	
-	--========
-	--EXAMPLE
-	--========
-	--local background = display.newImage( "background.png" )
-    --sceneGroup:insert( background )
 	
 	--get our scene view
     local sceneGroup = self.view
@@ -60,7 +106,7 @@ function scene:show( event )
 		--re-entering the scene
 	
 	--show the title
-	title = display.newText( "Zombies!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
+	title = display.newText( "Zenbies!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
 	title:setFillColor( 0, 0, 0 )	
 				
 	-- Create the start button
@@ -97,17 +143,17 @@ function scene:show( event )
 		strokeWidth = 2
 	}
 		
-		
 		-- Center the buttons
 		startButton.x = display.contentCenterX
 		startButton.y = display.contentCenterY-40
 		optionsButton.x = display.contentCenterX
 		optionsButton.y = display.contentCenterY+40
-		-- Change the button's label text
+		-- Change the buttons' label text
 		startButton:setLabel( "Start" )
 		optionsButton:setLabel( "Options" )
 	
-
+	loadGame()
+	
 	sceneGroup:insert(startButton)
 	sceneGroup:insert(optionsButton)
 	sceneGroup:insert(title)

@@ -15,5 +15,14 @@ fixed inverted map scrolling
 added removal of event handlers
 moved room sizes to detectlevel function
 
+0.07
+optimized roomCount variable
+added scrollspeed saved in settings file
+added level progress saved in settings file
+greyed out levels you can't play yet
+made levels you can't play unclickable
+
 -TO DO
 momentum when scrolling
+fix scrollspeed circle thing location when loading saved settings
+pinch and zoom

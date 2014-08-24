@@ -10,5 +10,9 @@ rtn.level0RoomY={50, 95, 50, 270}
 rtn.level0RoomW={50, 100, 300, 75}
 rtn.level0RoomH={25, 300, 200, 50}
 rtn.scrollSpeed = nil
+rtn.levelCleared = {}
+rtn.infUnlocked = 0
+
+rtn.saveFile = system.pathForFile( "zenbiesave.txt", system.DocumentsDirectory)
 
 return rtn

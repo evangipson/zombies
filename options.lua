@@ -43,8 +43,18 @@ local function sliderSlide( event )
 	end
 	constants.scrollSpeed = newSpeed/100
 	speedText.text = newSpeed
+	saveSettings()
 	return true
 	end
+end
+
+function saveSettings()
+	local file = io.open( constants.saveFile, "w")
+		file:write( constants.scrollSpeed, "\n" )
+		for i=1,10 do
+			file:write( constants.levelCleared[i], "\n" )
+		end
+	io.close( file )
 end
 
 --===============
@@ -58,7 +68,7 @@ function scene:create( event )
 	--but i don't feel like doing math that complicated right now
 		constants.scrollSpeed = 0.05
 	end
-	tempSpeed = constants.scrollSpeed *100
+	tempSpeed = constants.scrollSpeed*100
 
 	--get our scene view
     local sceneGroup = self.view
