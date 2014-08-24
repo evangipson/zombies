@@ -8,3 +8,12 @@ created options screen
 0.05
 fixed options screen and back button
 added sensitivity scroller to options
+
+0.06
+added level choice menu
+fixed inverted map scrolling
+added removal of event handlers
+moved room sizes to detectlevel function
+
+-TO DO
+momentum when scrolling

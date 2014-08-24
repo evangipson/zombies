@@ -10,7 +10,9 @@ local menuLoop, startButton, optionsButton, title, menuLoopChannel
 local function handleStartEvent( event )
     if ( "ended" == event.phase ) then
         -- Assumes that "menu.lua" exists and is configured as a Composer scene
-		composer.gotoScene( "game" )
+		--!!sometimes when start is clicked it also automatically clicks the tutorial button because it's in the same place
+		--have to do something with that shit here
+		composer.gotoScene( "chooselevel" )
     end
 end
 
@@ -108,6 +110,7 @@ function scene:show( event )
 
 	sceneGroup:insert(startButton)
 	sceneGroup:insert(optionsButton)
+	sceneGroup:insert(title)
 	
 	--"did" fires when the scene is FULLY
 	--on the screen.		

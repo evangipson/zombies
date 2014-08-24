@@ -7,19 +7,65 @@ local roomArray={}
 local roomCount
 local moveWorld
 local player,playerX,playerY
+local roomX={}
+local roomY={}
+local roomW={}
+local roomH={}
 
 --this function will create a room
 --there will be 2 different applications:
 --1) initial room creation
 --2) everytime the player chooses to leave a room
+function detectLevel()
+	--check which level player is on and set variables accordingly
+	if constants.currentLevel == 0 then
+		roomCount = 4
+		for i=1,roomCount do
+			roomX[i] = constants.level0RoomX[i]
+			roomY[i] = constants.level0RoomY[i]
+			roomW[i] = constants.level0RoomW[i]
+			roomH[i] = constants.level0RoomH[i]
+			print(roomX[i])
+		end
+	end
+	if constants.currentLevel == 1 then
+	
+	end
+	if constants.currentLevel == 2 then
+	
+	end
+	if constants.currentLevel == 3 then
+	
+	end
+	if constants.currentLevel == 4 then
+	
+	end
+	if constants.currentLevel == 5 then
+	
+	end
+	if constants.currentLevel == 6 then
+	
+	end
+	if constants.currentLevel == 7 then
+	
+	end
+	if constants.currentLevel == 8 then
+	
+	end
+	if constants.currentLevel == 9 then
+	
+	end
+	if constants.currentLevel == 10 then
+	
+	end
+end
+
 function createRoom(init)
-	--??need an if for the level here too, or where
-	level0RoomCount = 4	
-	--??case level is 0 then level 0 room count etc below... same for levelSize
-	roomCount = level0RoomCount
+	detectLevel()
+	--!!case level is 0 then level 0 room count etc below... same for levelSize
 	-- add it to the roomArray
 	for i=1,roomCount do
-		roomArray[i] = {constants.level0RoomX[i], constants.level0RoomY[i], constants.level0RoomW[i], constants.level0RoomH[i]}
+		roomArray[i] = {roomX[i], roomY[i], roomW[i], roomH[i]}
 	end
 	
 	--enter this rect in an array for
@@ -42,8 +88,8 @@ function moveWorld(event)
     local xScroll, yScroll
 
     if event.phase == "moved" then
-        xScroll=((event.xStart-event.x)/1)*constants.scrollSpeed
-        yScroll=((event.yStart-event.y)/1)*constants.scrollSpeed
+        xScroll=((event.xStart-event.x)*-1)*constants.scrollSpeed
+        yScroll=((event.yStart-event.y)*-1)*constants.scrollSpeed
 		--stop it from scrolling outside map
 		if (xScroll+constants.levelSize[1][1]) > 0 then
 			xScroll = 0
@@ -157,6 +203,7 @@ function scene:show( event )
         end
         print("In game.")
 		print("Scrollspeed: ",constants.scrollSpeed)
+		print("Level: ",constants.currentLevel)
     end
 end
 
@@ -168,7 +215,9 @@ function scene:hide( event )
         --remove stuff initialized in the
         --"did" phase of the show scene.
         --unallocate timers, transitions, sprite stuff.
-
+        Runtime:removeEventListener( "enterFrame" , renderOut)
+        Runtime:removeEventListener( "touch" , moveWorld)
+		
     elseif ( phase == "did" ) then
         --not much to do here, except force removal of
         --the scene after it transitions of screen for optimization.

@@ -47,8 +47,6 @@ local function sliderSlide( event )
 	end
 end
 
---??add function so you can click anywhere on sliderRect to move the circle too
-
 --===============
 --SCENE FUNCTIONS
 --===============
@@ -56,7 +54,8 @@ function scene:create( event )
 	--init menu-specific variables and audio here
 	--make sure to insert objects into sceneGroup
 	if constants.scrollSpeed == nil then 
-	--!!need to load it from global variables here and set the slider position based on it
+	--!!need to load it from global variables here and set the slider position based on it 
+	--but i don't feel like doing math that complicated right now
 		constants.scrollSpeed = 0.05
 	end
 	tempSpeed = constants.scrollSpeed *100
