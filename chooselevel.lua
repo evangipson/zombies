@@ -8,6 +8,7 @@ local nameArray={}
 local levelpic={}
 local levelTitle={}
 local moveImages
+--local xMomentum = 0
 
 --??i don't know if we can do this in a loop with concatenating i to "level" and ".png"
 --!!need to add infinite mode here too
@@ -38,6 +39,22 @@ levelTitle[11] = "Apocalypse"
 --==============
 --USER FUNCTIONS
 --==============
+--function momentumMove( event )
+	--check to see if we're going left or right
+--	if xMomentum < 0 then
+--		for i=1,11 do
+--			levelpic[i].x = levelpic[i].x-100
+--			nameArray[i].x = nameArray[i].x-100
+--		end
+--	end
+--	if xMomentum > 0 then
+--		for i=1,11 do
+--			levelpic[i].x = levelpic[i].x-(xMomentum/10)
+--			nameArray[i].x = nameArray[i].x-(xMomentum/10)
+--		end
+--	end
+--end
+
 function moveImages( event )
     local xScroll
 	if event.phase == "moved" then
@@ -53,9 +70,37 @@ function moveImages( event )
 		for i=1,11 do
 			levelpic[i].x = levelpic[i].x+xScroll
 			nameArray[i].x = nameArray[i].x+xScroll
+			--??insert the performWithDelay timer here maybe?
 		end
+--		xMomentum = xMomentum+xScroll
 	end
-	
+--	if event.phase == "ended" then
+--		print(xMomentum)
+		--check to see if we're going left or right		
+--		if xMomentum < 0 then --we're going left
+--			for i=1,(xMomentum*-1) do
+--				timer.performWithDelay ((i*-1)*1000, momentumMove, 0)
+--				print(xMomentum*-1)
+--				xMomentum=xMomentum+1
+--			end
+--			xMomentum = 0
+			--while xMomentum < 0 do
+				--timer.performWithDelay( 100, momentumMove, xMomentum/10 )
+				--momentumMove()
+				--print(xMomentum)
+			--end
+--		end
+--		if xMomentum > 0 then --we're going right
+--		while xMomentum > 0 do
+--				timer.performWithDelay( 100, momentumMove, xMomentum/10 )
+--				xMomentum = xMomentum-10
+--				if xMomentum < 0 then
+--					xMomentum = 0
+--				end
+--			end
+--		end
+--		print(xMomentum)
+--	end
 	return true
 end
 

@@ -22,7 +22,10 @@ added level progress saved in settings file
 greyed out levels you can't play yet
 made levels you can't play unclickable
 
+0.07a
+fixed scrollspeed circle x location depending on scrollspeed
+fixed crashing bug in options screen
+
 -TO DO
 momentum when scrolling
-fix scrollspeed circle thing location when loading saved settings
 pinch and zoom

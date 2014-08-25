@@ -4,6 +4,7 @@ local scene = composer.newScene()
 local widget = require( "widget" )
 local menuLoop, backButton, sliderCircle, speedText, menuLoopChannel, tempSpeed
 local sliderSize = {}
+local circleX = 0
 
 sliderSize[1] = {400,10}
 --==============
@@ -64,11 +65,8 @@ function scene:create( event )
 	--init menu-specific variables and audio here
 	--make sure to insert objects into sceneGroup
 	if constants.scrollSpeed == nil then 
-	--!!need to load it from global variables here and set the slider position based on it 
-	--but i don't feel like doing math that complicated right now
 		constants.scrollSpeed = 0.05
 	end
-	tempSpeed = constants.scrollSpeed*100
 
 	--get our scene view
     local sceneGroup = self.view
@@ -84,6 +82,7 @@ function scene:show( event )
     if ( phase == "will" ) then
 		--we position elements here, because we are 
 		--re-entering the scene
+	tempSpeed = constants.scrollSpeed*100	
 		
 			-- Create the back button
 	backButton = widget.newButton
@@ -114,6 +113,13 @@ function scene:show( event )
 		sliderCircle.strokeWidth = 2
 		sliderCircle:setStrokeColor( 0, 0, 0 )
 		sliderCircle.id = sliderCircle
+	--set it to be on the slider depending on what the scrollspeed is set to
+		local leftside = (display.contentWidth-sliderSize[1][1])/2
+		sliderCircle.x = leftside+((constants.scrollSpeed*100)-1)*45
+		if constants.scrollSpeed == "0.05" then
+			sliderCircle.x = display.contentCenterX
+		end
+		print(constants.scrollSpeed)
 	
 	--and the speed thing
 	speedText = display.newText (tempSpeed, display.contentCenterX, display.contentCenterY-70)

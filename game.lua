@@ -132,6 +132,7 @@ function renderOut()
     levelMap.strokeWidth = 4
     levelMap:setFillColor(  1, 1, 1  )
     levelMap:setStrokeColor( 0.5, 0.5, 0.5 )
+	levelMap.xScale = 1
     table.insert(world,levelMap)
 	
     --now lets fill up that display
