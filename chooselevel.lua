@@ -23,6 +23,7 @@ imageArray[8]="level7.png"
 imageArray[9]="level8.png"
 imageArray[10]="level9.png"
 imageArray[11]="level10.png"
+imageArray[12]="leveli.png"
 
 levelTitle[1] = "Tutorial"
 levelTitle[2] = "Patient Zero"
@@ -35,6 +36,7 @@ levelTitle[8] = "Pandemic"
 levelTitle[9] = "Onslaught"
 levelTitle[10] = "Epidemic"
 levelTitle[11] = "Apocalypse"
+levelTitle[12] = "Infinite mode"
 
 --==============
 --USER FUNCTIONS
@@ -59,15 +61,15 @@ function moveImages( event )
     local xScroll
 	if event.phase == "moved" then
 		xScroll=((event.xStart-event.x)*-1)*0.015
-		if levelpic[1].x+xScroll > display.contentCenterX then
+		if levelpic[12].x+xScroll > display.contentCenterX then
 			xScroll = 0
-			levelpic[1].x = display.contentCenterX
+			levelpic[12].x = display.contentCenterX
 		end
 		if levelpic[11].x+xScroll < display.contentCenterX then
 			xScroll = 0
 			levelpic[11].x=display.contentCenterX
 		end
-		for i=1,11 do
+		for i=1,12 do
 			levelpic[i].x = levelpic[i].x+xScroll
 			nameArray[i].x = nameArray[i].x+xScroll
 			--??insert the performWithDelay timer here maybe?
@@ -145,6 +147,16 @@ function scene:show( event )
 	--re-entering the scene
 	title = display.newText("Choose level", display.contentCenterX, display.contentCenterY-(display.contentHeight/2)+40)
 	title:setFillColor( 0, 0, 0)
+	--add infinite mode pic
+	levelpic[12] = display.newImage(imageArray[12], display.contentCenterX-150, display.contentCenterY)
+	nameArray[12] = display.newText(levelTitle[12], display.contentCenterX-150, display.contentCenterY+80)
+	nameArray[12]:setFillColor( 0, 0, 0)
+	levelpic[12]:addEventListener( "tap", clickLevel )
+	levelpic[12].name = 11
+	if constants.levelCleared[11] == "false" then
+			levelpic[12].alpha = 0.4
+			nameArray[12].alpha = 0.4
+	end
 	--add tutorial pic
 	levelpic[1] = display.newImage(imageArray[1], display.contentCenterX, display.contentCenterY)
 	nameArray[1] = display.newText(levelTitle[1], display.contentCenterX, display.contentCenterY+80)

@@ -66,6 +66,9 @@ local function loadGame()
 		if lineNumber == 11 then
 			constants.levelCleared[10] = line
 		end
+		if lineNumber == 12 then
+			constants.levelCleared[11] = line
+		end
 		lineNumber = lineNumber + 1
 	end
 	io.close(file)

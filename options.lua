@@ -52,7 +52,7 @@ end
 function saveSettings()
 	local file = io.open( constants.saveFile, "w")
 		file:write( constants.scrollSpeed, "\n" )
-		for i=1,10 do
+		for i=1,11 do
 			file:write( constants.levelCleared[i], "\n" )
 		end
 	io.close( file )

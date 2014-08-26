@@ -26,6 +26,9 @@ made levels you can't play unclickable
 fixed scrollspeed circle x location depending on scrollspeed
 fixed crashing bug in options screen
 
+v0.07b
+added infinite mode on level select
+
 -TO DO
 momentum when scrolling
 pinch and zoom
