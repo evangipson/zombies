@@ -1,4 +1,4 @@
-local composer = require( "composer" )
+composer = require( "composer" )
 local constants = require( "constants" )
 local scene = composer.newScene()
 local widget = require( "widget" )
@@ -26,9 +26,27 @@ local function handleOptionsEvent( event )
 end
 
 local function loadGame()
+	local fileFound = io.open(constants.saveFile)
 	--to track which line of the file we're reading
+	--check if file exists
+	if fileFound then
+		print("yes")
+		fileFound:close()
+	else
+	--make new file
+		local file2 = io.open( constants.saveFile, "w")
+		file2:write( 0.05, "\n" )
+		for i=1,11 do
+			file2:write( "false", "\n" )
+		end
+		io.close( file2 )
+		print("file written")
+	end
+	if godDamnit == 0 then
+	end
+	
 	local lineNumber = 1
-	--open the save file
+	--now open the save file and read variables and shit
 	local file = io.open( constants.saveFile, "r")
 	for line in file:lines() do
 		--scrollSpeed is on the first line so read that first
@@ -76,6 +94,7 @@ local function loadGame()
 	if constants.scrollSpeed == nil then
 		constants.scrollSpeed = 0.05
 	end
+
 	--!!add somewhere to see if levels are cleared and unlock the next one etc
 --	for i=1,10 do
 --		print(constants.levelCleared[i])

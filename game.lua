@@ -80,8 +80,8 @@ function clickCiv( event )
 		--add civilian to zombie array
 		--!!why won't the circles change?!
 		print(event.target.arrayNumber)
-		civCircles[1]:setFillColor( 0.4, 1, 1 )
-		civCircles[event.target.arrayNumber]:removeEventListener( "tap", clickCiv )
+		--civCircles[1]:setFillColor( 0.4, 1, 1 )
+		--civCircles[event.target.arrayNumber]:removeEventListener( "tap", clickCiv )
 		zombieArray[zombieCount+1] = {civilianArray[event.target.arrayNumber][1],civilianArray[event.target.arrayNumber][2]}
 		--remove it from civilian table
 		table.remove(civilianArray, event.target.arrayNumber)
@@ -106,7 +106,9 @@ end
 
 function drawZombies()
 	for i=1,#zombieArray do
-		
+		zombieCircles[i] = display.newCircle(zombieArray[i][1], zombieArray[i][2],5)
+		zombieCircles[i]:setFillColor( 0.8, 0, 0, 0.8 )
+		zombieCircles[i].arrayNumber = i
 		print("there's a zombie")
 	end
 end
