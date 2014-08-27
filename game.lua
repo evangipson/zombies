@@ -4,13 +4,19 @@ local scene = composer.newScene()
 local world = {}
 mRand = math.random
 local roomArray={}
-local roomCount
+local roomCount, civCount
 local moveWorld
-local player,playerX,playerY
 local roomX={}
 local roomY={}
 local roomW={}
 local roomH={}
+local civilianArray = {}
+local civCircles = {}
+local zombieArray = {}
+local zombieCircles = {}
+local militaryArray = {}
+local zombieClicks
+local zombieCount = 0
 
 --this function will create a room
 --there will be 2 different applications:
@@ -19,6 +25,7 @@ local roomH={}
 function detectLevel()
 	--check which level player is on and set room variables accordingly
 	if constants.currentLevel == 0 then
+		--add room locations
 		roomCount = #constants.level0RoomX
 		for i=1,roomCount do
 			roomX[i] = constants.level0RoomX[i]
@@ -26,6 +33,13 @@ function detectLevel()
 			roomW[i] = constants.level0RoomW[i]
 			roomH[i] = constants.level0RoomH[i]
 		end
+		--add civilian locations
+		civCount = #constants.level0CivX
+		for i=1,civCount do
+			civilianArray[i]={constants.level0CivX[i],constants.level0CivY[i]}
+		end
+		--add the amount of click things
+		zombieClicks = constants.level0Zombies
 	end
 	if constants.currentLevel == 1 then
 	
@@ -56,6 +70,44 @@ function detectLevel()
 	end
 	if constants.currentLevel == 10 then
 	
+	end
+end
+
+function clickCiv( event )
+	if zombieClicks > 0 then
+		--the zombie will be inserted in the next slot in the array, so the zombie count + 1.
+		--event.target.arrayNumber is given to the civilians when the map is drawn and is their unique identifier.
+		--add civilian to zombie array
+		--!!why won't the circles change?!
+		print(event.target.arrayNumber)
+		civCircles[1]:setFillColor( 0.4, 1, 1 )
+		civCircles[event.target.arrayNumber]:removeEventListener( "tap", clickCiv )
+		zombieArray[zombieCount+1] = {civilianArray[event.target.arrayNumber][1],civilianArray[event.target.arrayNumber][2]}
+		--remove it from civilian table
+		table.remove(civilianArray, event.target.arrayNumber)
+		--increase zombiecount because there's a zombie now
+		zombieCount = zombieCount+1
+		--this is just test output
+		print(zombieArray[1][1],zombieArray[1][2])
+		if zombieCount > 1 then
+		print(zombieArray[2][1],zombieArray[2][2])
+		end
+		if zombieCount > 2 then
+		print(zombieArray[3][1],zombieArray[3][2])
+		end
+		print(zombieCount)
+		zombieClicks = zombieClicks - 1
+		drawZombies()
+	else
+		print("nope lol")
+	end
+	return true
+end
+
+function drawZombies()
+	for i=1,#zombieArray do
+		
+		print("there's a zombie")
 	end
 end
 
@@ -109,9 +161,13 @@ function moveWorld(event)
             roomArray[i][1]=roomArray[i][1]+xScroll
             roomArray[i][2]=roomArray[i][2]+yScroll
         end
-        --now we can move the player
-        playerX = playerX + xScroll
-        playerY = playerY + yScroll
+		--now move the civilians
+		for i=1,#civilianArray do
+			civilianArray[i][1]=civilianArray[i][1]+xScroll
+			civilianArray[i][2]=civilianArray[i][2]+yScroll
+		--!!circles stay outside the map and i have no idea why
+		end
+
 		--and the map itself
 		constants.levelSize[1][1]=constants.levelSize[1][1]+xScroll
 		constants.levelSize[1][2]=constants.levelSize[1][2]+yScroll
@@ -142,13 +198,21 @@ function renderOut()
         myRectangle:setFillColor(  0.52, 0.81, 0.93  )
         myRectangle:setStrokeColor( 0 )
         table.insert(world,myRectangle)
-
     end
-	
-    --let's put the player in the room here
-    player = display.newRect(playerX,playerY,10,10)
-    player:setFillColor(  0.22, 0.51, 0.63  )
-    table.insert(world,player)
+	--insert civilians
+	for i=1,#civilianArray do
+		civCircles[i] = display.newCircle(civilianArray[i][1], civilianArray[i][2],5)
+		civCircles[i]:setFillColor( 0, 0, 1, 0.8 )
+		civCircles[i]:addEventListener( "tap", clickCiv )
+		civCircles[i].arrayNumber = i
+	end
+	--add the click counter	
+	clickRect = display.newRect(display.contentWidth-10, display.contentHeight-20, 15, 15)
+	clickRect:setFillColor( 1, 1, 1 )
+	clickRect.strokeWidth = 1
+	clickRect:setStrokeColor( 0.4, 0.4, 0.4)
+	clickCounter = display.newText(zombieClicks, display.contentWidth-10, display.contentHeight-20, native.systemFont, 14)
+	clickCounter:setFillColor( 0, 0, 0)
 end
 
 function scene:create( event )
@@ -167,10 +231,6 @@ function scene:create( event )
 
     --create initial room
     createRoom(true)
-
-    --set player's initial position
-    playerX = display.contentCenterX
-    playerY = display.contentCenterX
 
     --get our scene view
     local sceneGroup = self.view
@@ -201,7 +261,6 @@ function scene:show( event )
         for i=1,#world do
             --world[i]:addEventListener("touch",getInfo)
         end
-        print("In game.")
 		print("Scrollspeed: ",constants.scrollSpeed)
 		print("Level: ",constants.currentLevel)
     end

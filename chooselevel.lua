@@ -8,6 +8,7 @@ local nameArray={}
 local levelpic={}
 local levelTitle={}
 local moveImages
+local zombieClicks
 --local xMomentum = 0
 
 --??i don't know if we can do this in a loop with concatenating i to "level" and ".png"

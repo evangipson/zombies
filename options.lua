@@ -11,6 +11,9 @@ sliderSize[1] = {400,10}
 --USER FUNCTIONS
 --==============
 -- Function to handle button events
+
+--!!click counter location setting to be added
+
 local function handleBackEvent( event )
 
     if ( "ended" == event.phase ) then
