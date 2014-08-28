@@ -2,7 +2,9 @@ composer = require( "composer" )
 local constants = require( "constants" )
 local scene = composer.newScene()
 local widget = require( "widget" )
-local menuLoop, startButton, optionsButton, title, menuLoopChannel
+local menuLoop, startButton, optionsButton, statsButton, title, menuLoopChannel
+
+display.setStatusBar( display.HiddenStatusBar )   
 --==============
 --USER FUNCTIONS
 --==============
@@ -10,19 +12,30 @@ local menuLoop, startButton, optionsButton, title, menuLoopChannel
 local function handleStartEvent( event )
     if ( "ended" == event.phase ) then
         -- Assumes that "menu.lua" exists and is configured as a Composer scene
-		--!!sometimes when start is clicked it also automatically clicks the tutorial button because it's in the same place
 		--have to do something with that shit here
-		composer.gotoScene( "chooselevel" )
+		timer.performWithDelay( 1, goStart )
     end
+	return true
+end
+
+function goStart()
+	composer.gotoScene( "chooselevel" )
 end
 
 local function handleOptionsEvent( event )
-
     if ( "ended" == event.phase ) then
 		-- Assumes that "menu.lua" exists and is configured as a Composer scene
-		--?? do i need to remove this every time? if i don't, it doesn't go through the create thing and make buttons again...
 		composer.gotoScene( "options" )
     end
+	return true
+end
+
+local function handleStatsEvent( event )
+    if ( "ended" == event.phase ) then
+		-- Assumes that "menu.lua" exists and is configured as a Composer scene
+		composer.gotoScene( "stats" )
+    end
+	return true
 end
 
 local function loadGame()
@@ -30,7 +43,7 @@ local function loadGame()
 	--to track which line of the file we're reading
 	--check if file exists
 	if fileFound then
-		print("yes")
+		print("Save file found.")
 		fileFound:close()
 	else
 	--make new file
@@ -39,10 +52,14 @@ local function loadGame()
 		for i=1,11 do
 			file2:write( "false", "\n" )
 		end
+		file2:write( "Bottom Right", "\n")
+		file2:write( constants.timerOn, "\n")
+		file2:write( constants.totalInfections, "\n")
+		file2:write( constants.totalLost, "\n")
+		file2:write( constants.gamesPlayed, "\n")
+		file2:write( constants.timePlayed, "\n")
 		io.close( file2 )
-		print("file written")
-	end
-	if godDamnit == 0 then
+		print("New save created.")
 	end
 	
 	local lineNumber = 1
@@ -87,6 +104,24 @@ local function loadGame()
 		if lineNumber == 12 then
 			constants.levelCleared[11] = line
 		end
+		if lineNumber == 13 then
+			constants.counterLocation = line
+		end
+		if lineNumber == 14 then
+			constants.timerOn = line
+		end
+		if lineNumber == 15 then
+			constants.totalInfections = line
+		end
+		if lineNumber == 16 then
+			constants.totalLost = line
+		end
+		if lineNumber == 17 then
+			constants.gamesPlayed = line
+		end
+		if lineNumber == 18 then
+			constants.timePlayed = line
+		end
 		lineNumber = lineNumber + 1
 	end
 	io.close(file)
@@ -94,11 +129,6 @@ local function loadGame()
 	if constants.scrollSpeed == nil then
 		constants.scrollSpeed = 0.05
 	end
-
-	--!!add somewhere to see if levels are cleared and unlock the next one etc
---	for i=1,10 do
---		print(constants.levelCleared[i])
---	end
 end
 
 --===============
@@ -120,27 +150,25 @@ end
 function scene:show( event )
     local sceneGroup = self.view
     local phase = event.phase
-    
-	--"will" fires when the scene has been called
-	--but it's not on screen yet.
-    if ( phase == "will" ) then
-		--we position elements here, because we are 
-		--re-entering the scene
 	
+	--"will" fires when the scene has been called but it's not on screen yet.
+    if ( phase == "will" ) then
+	--we position elements here, because we are re-entering the scene
 	--show the title
-	title = display.newText( "Zenbies!", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
+	title = display.newText( "InfectZen", display.contentCenterX, display.contentCenterY-100, native.systemFont, 16 )
 	title:setFillColor( 0, 0, 0 )	
 				
 	-- Create the start button
 	startButton = widget.newButton
 	{
 		label = "button",
-		onEvent = handleStartEvent,
+		onRelease = handleStartEvent,
 		emboss = false,
 		--properties for a rounded rectangle button...
 		shape="roundedRect",
 		width = 200,
 		height = 40,
+		font = native.systemFont,
 		cornerRadius = 10,
 		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
 		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
@@ -158,6 +186,24 @@ function scene:show( event )
 		shape="roundedRect",
 		width = 200,
 		height = 40,
+		font = native.systemFont,
+		cornerRadius = 10,
+		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+		strokeWidth = 2
+	}
+	
+	statsButton = widget.newButton
+	{
+		label = "button",
+		onEvent = handleStatsEvent,
+		emboss = false,
+		--properties for a rounded rectangle button...
+		shape="roundedRect",
+		width = 200,
+		height = 40,
+		font = native.systemFont,
 		cornerRadius = 10,
 		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
 		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
@@ -169,23 +215,27 @@ function scene:show( event )
 		startButton.x = display.contentCenterX
 		startButton.y = display.contentCenterY-40
 		optionsButton.x = display.contentCenterX
-		optionsButton.y = display.contentCenterY+40
+		optionsButton.y = display.contentCenterY+20
+		statsButton.x = display.contentCenterX
+		statsButton.y = display.contentCenterY+80
 		-- Change the buttons' label text
 		startButton:setLabel( "Start" )
 		optionsButton:setLabel( "Options" )
+		statsButton:setLabel( "Statistics" )
 	
 	loadGame()
 	
 	sceneGroup:insert(startButton)
 	sceneGroup:insert(optionsButton)
 	sceneGroup:insert(title)
+	constants.victory = 0
 	
 	--"did" fires when the scene is FULLY
 	--on the screen.		
     elseif ( phase == "did" ) then
 		--start runtime listeners like "enterFrame"
 		--start timers, transitions, sprite animations.
-		print( "Hello World!" )
+		print( "Game loaded." )
 			
 		-- Play the background music on channel 1, loop infinitely, and fade in over 5 seconds 
 		--menuLoopChannel = audio.play( menuLoop, { channel=1, loops=-1, fadein=100 } )
@@ -203,6 +253,7 @@ function scene:hide( event )
 		startButton:removeSelf()
 		optionsButton:removeSelf()
 		title:removeSelf()
+		statsButton:removeSelf()
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)

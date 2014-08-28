@@ -2,7 +2,7 @@ local composer = require( "composer" )
 local constants = require( "constants" )
 local scene = composer.newScene()
 local widget = require( "widget" )
-local menuLoop, backButton, sliderCircle, speedText, menuLoopChannel, tempSpeed
+local menuLoop, backButton, counterButton, sliderCircle, speedText, menuLoopChannel, tempSpeed
 local sliderSize = {}
 local circleX = 0
 
@@ -12,7 +12,23 @@ sliderSize[1] = {400,10}
 --==============
 -- Function to handle button events
 
---!!click counter location setting to be added
+local function handleCounterEvent( event )
+
+    if ( "ended" == event.phase ) then
+        if constants.counterLocation == "Bottom Right" then
+			constants.counterLocation = "Bottom Left"
+		elseif constants.counterLocation == "Bottom Left" then
+			constants.counterLocation = "Top Left"
+		elseif constants.counterLocation == "Top Left" then
+			constants.counterLocation = "Top Right"
+		elseif constants.counterLocation == "Top Right" then
+			constants.counterLocation = "Bottom Right"
+		end
+    end
+	counterButton:setLabel( constants.counterLocation )
+	saveSettings()
+	return true
+end
 
 local function handleBackEvent( event )
 
@@ -22,31 +38,45 @@ local function handleBackEvent( event )
     end
 end
 
-local function handleStartEvent( event )
+local function handleTimerEvent( event )
 
     if ( "ended" == event.phase ) then
-        -- Assumes that "menu.lua" exists and is configured as a Composer scene
-		composer.gotoScene( "game" )
+		if constants.timerOn == "Timer Shown" then
+			constants.timerOn = "Timer Hidden"
+			saveSettings()
+			timerButton:setLabel( constants.timerOn )
+		else
+			constants.timerOn = "Timer Shown"
+			saveSettings()
+			timerButton:setLabel( constants.timerOn )
+		end
     end
+	return true
 end
 
 local function sliderSlide( event )
 	if event.phase == "began" then
 		circleX = event.xStart
 		sliderCircle.x = event.xStart
-	elseif event.phase == "moved" then
-		circlexScroll=((event.xStart-event.x)/1)
-		sliderCircle.x = circleX-circlexScroll
-	--now add some math to change the scrollspeed
 	local leftside = (display.contentWidth-sliderSize[1][1])/2
-	--local middle = sliderSize[1][1]/2+leftside
-	--print(display.contentWidth, leftside, middle, (sliderCircle.x-leftside))
 	local newSpeed = math.round((sliderCircle.x-leftside)/(sliderSize[1][1]/10))
 	if newSpeed < 1 then
 		newSpeed = 1
 	end
 	constants.scrollSpeed = newSpeed/100
-	speedText.text = newSpeed
+	speedText.text = "Scroll speed: "..newSpeed
+	saveSettings()
+	elseif event.phase == "moved" then
+		circlexScroll=((event.xStart-event.x)/1)
+		sliderCircle.x = circleX-circlexScroll
+	--now add some math to change the scrollspeed
+	local leftside = (display.contentWidth-sliderSize[1][1])/2
+	local newSpeed = math.round((sliderCircle.x-leftside)/(sliderSize[1][1]/10))
+	if newSpeed < 1 then
+		newSpeed = 1
+	end
+	constants.scrollSpeed = newSpeed/100
+	speedText.text = "Scroll speed: "..newSpeed
 	saveSettings()
 	return true
 	end
@@ -58,6 +88,12 @@ function saveSettings()
 		for i=1,11 do
 			file:write( constants.levelCleared[i], "\n" )
 		end
+		file:write( constants.counterLocation, "\n")
+		file:write( constants.timerOn, "\n")
+		file:write( constants.totalInfections, "\n")
+		file:write( constants.totalLost, "\n")
+		file:write( constants.gamesPlayed, "\n")
+		file:write( constants.timePlayed, "\n")
 	io.close( file )
 end
 
@@ -80,11 +116,9 @@ function scene:show( event )
     local sceneGroup = self.view
     local phase = event.phase
     
-	--"will" fires when the scene has been called
-	--but it's not on screen yet.
+	--"will" fires when the scene has been called but it's not on screen yet.
     if ( phase == "will" ) then
-		--we position elements here, because we are 
-		--re-entering the scene
+		--we position elements here, because we are re-entering the scene
 	tempSpeed = constants.scrollSpeed*100	
 		
 			-- Create the back button
@@ -97,6 +131,7 @@ function scene:show( event )
 		shape="roundedRect",
 		width = 200,
 		height = 40,
+		font = native.systemFont,
 		cornerRadius = 10,
 		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
 		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
@@ -104,14 +139,14 @@ function scene:show( event )
 		strokeWidth = 2
 	}
 	--show the sensitivity slider
-		sliderRect = display.newRoundedRect(display.contentCenterX,display.contentCenterY-40,sliderSize[1][1],sliderSize[1][2],5)
+		sliderRect = display.newRoundedRect(display.contentCenterX,display.contentCenterY-20,sliderSize[1][1],sliderSize[1][2],5)
 	    sliderRect.strokeWidth = 1
         sliderRect:setFillColor(  0.5, 0.5, 0.5  )
         sliderRect:setStrokeColor( 0 )
 		sliderRect:addEventListener( "touch", sliderSlide )
 		
 	--add the circle thing
-		sliderCircle = display.newCircle(display.contentCenterX,display.contentCenterY-40,10)
+		sliderCircle = display.newCircle(display.contentCenterX,display.contentCenterY-20,10)
 		sliderCircle:setFillColor( 0.5 )
 		sliderCircle.strokeWidth = 2
 		sliderCircle:setStrokeColor( 0, 0, 0 )
@@ -122,38 +157,57 @@ function scene:show( event )
 		if constants.scrollSpeed == "0.05" then
 			sliderCircle.x = display.contentCenterX
 		end
-		print(constants.scrollSpeed)
 	
 	--and the speed thing
-	speedText = display.newText (tempSpeed, display.contentCenterX, display.contentCenterY-70)
+	speedText = display.newText ("Scroll speed: "..tempSpeed, display.contentCenterX, display.contentCenterY-40, native.systemFont, 16 )
 	speedText:setFillColor( 0, 0, 0 )
+	counterText = display.newText ("Infection counter location:", display.contentCenterX, display.contentCenterY-125, native.systemFont, 16 )
+	counterText:setFillColor( 0, 0, 0 )
 	
-	--!! TEMP BUTTON FOR THE GAME START
-	startButton = widget.newButton
+	timerButton = widget.newButton
 	{
 		label = "button",
-		onEvent = handleStartEvent,
+		onEvent = handleTimerEvent,
 		emboss = false,
 		--properties for a rounded rectangle button...
 		shape="roundedRect",
 		width = 200,
 		height = 40,
+		font = native.systemFont,
 		cornerRadius = 10,
 		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
 		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
 		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
 		strokeWidth = 2
 	}
-		
-		-- Center the button
+	
+	counterButton = widget.newButton
+	{
+		label = constants.counterLocation,
+		onEvent = handleCounterEvent,
+		emboss = false,
+		--properties for a rounded rectangle button...
+		shape="roundedRect",
+		width = 200,
+		height = 40,
+		font = native.systemFont,
+		cornerRadius = 10,
+		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+		strokeWidth = 2	
+	}
+
+		-- Center the buttons
 		backButton.x = display.contentCenterX
-		backButton.y = display.contentCenterY+40
-		-- Change the button's label text
+		backButton.y = display.contentCenterY+100
+		timerButton.x = display.contentCenterX
+		timerButton.y = display.contentCenterY+30
+		counterButton.x = display.contentCenterX
+		counterButton.y = display.contentCenterY-90
+		-- Change the buttons' label text
 		backButton:setLabel( "Back" )
-		
-		startButton.x = display.contentCenterX
-		startButton.y = display.contentCenterY+100
-		startButton:setLabel( "Start" )
+		timerButton:setLabel( constants.timerOn )
 		
 	--"did" fires when the scene is FULLY
 	--on the screen.
@@ -178,14 +232,15 @@ function scene:hide( event )
 		sliderRect:removeSelf()
 		sliderCircle:removeSelf()
 		speedText:removeSelf()
-		startButton:removeSelf()
+		timerButton:removeSelf()
+		counterButton:removeSelf()
+		counterText:removeSelf()
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)
 		--set each variable we are allocating to nil
 		--to ensure proper cleanup
-		backButton, sliderRect, sliderCircle, speedText, startButton = nil
-		
+		backButton, sliderRect, sliderCircle, speedText, timerButton, counterText, counterButton = nil
     elseif ( phase == "did" ) then
 		--not much to do here, except force removal of
 		--the scene after it transitions of screen for optimization.

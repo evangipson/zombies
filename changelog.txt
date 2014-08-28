@@ -29,6 +29,33 @@ fixed crashing bug in options screen
 v0.07b
 added infinite mode on level select
 
+v0.08
+fixed no save file error
+added civilian actors
+added zombie click counter
+
+v0.09
+added civilian to zombie change
+fixed bug when clicking removed civilian
+general code cleanup and optimization
+changed the level select screen to scrollview
+fixed font errors
+fixed error with clicking on scroll bar for scrollSpeed
+fixed bug where it skips the level menu and goes straight to tutorial
+added infection counter location to options screen
+added victory conditions (all civilians+military or all zombies gone)
+added level progression/unlocking
+added level timer
+timer on/off option
+added civilians infected stat to after screen
+added zombies list stat to after screen
+added stat tracking: games played
+added stat tracking: time played
+added stat tracking: total infected
+added stat tracking: total zombies lost
+
 -TO DO
-momentum when scrolling
+momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
+stats reset button
+highscores
