@@ -17,18 +17,83 @@ local function handleMenuEvent( event )
 	return true
 end
 
+function handleYesEvent ( event )
+	constants.timePlayed = 0
+	constants.totalInfections = 0
+	constants.totalLost = 0
+	constants.gamesPlayed = 0
+	--save to file
+	local file = io.open( constants.saveFile, "w")
+		file:write( constants.scrollSpeed, "\n" )
+		for i=1,11 do
+			file:write( constants.levelCleared[i], "\n" )
+		end
+		file:write( constants.counterLocation, "\n")
+		file:write( constants.timerOn, "\n")
+		file:write( constants.totalInfections, "\n")
+		file:write( constants.totalLost, "\n")
+		file:write( constants.gamesPlayed, "\n")
+		file:write( constants.timePlayed, "\n")
+	io.close( file )
+	--remove the reset things
+	tempRect:removeSelf()
+	tempText:removeSelf()
+	yesButton:removeSelf()
+	noButton:removeSelf()
+	--remove and re-add the stats screen itself
+	totalGamesText:removeSelf()
+	totalTimeText:removeSelf()
+	totalInfText:removeSelf()
+	totalLostText:removeSelf()
+	
+	calcTime()
+	
+	totalGamesText = display.newText( "Games played: "..constants.gamesPlayed, display.contentCenterX, display.contentCenterY-120, native.systemFont, 16 )
+	totalGamesText:setFillColor ( 0, 0, 0 )
+	
+	totalTimeText = display.newText( "Time played: "..tempDay.."d, "..tempHour.."h, "..tempMinute.."m, "..tempSecond.."s", display.contentCenterX, display.contentCenterY-90, native.systemFont, 16 )
+	totalTimeText:setFillColor ( 0, 0, 0 )
+	
+	totalInfText = display.newText( "Total infected: "..constants.totalInfections, display.contentCenterX, display.contentCenterY-60, native.systemFont, 16 )
+	totalInfText:setFillColor ( 0, 0, 0 )
+	
+	totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
+	totalLostText:setFillColor ( 0, 0, 0 )
+	
+	return true
+end
+
+function handleNoEvent ( event )
+	tempRect:removeSelf()
+	tempText:removeSelf()
+	yesButton:removeSelf()
+	noButton:removeSelf()
+	return true
+end
+
 function handleResetEvent ( event )
+local options = {
+   text = "Warning! This will reset your stats!\nAre you sure you want to continue?",
+   x = display.contentCenterX,
+   y = display.contentCenterY,
+   width = 350,
+   height = 125,
+   fontSize = 20,
+   align = "center"
+}
+
     if ( "ended" == event.phase ) then
 		tempRect = display.newRect( display.contentCenterX, display.contentCenterY, 400, 200 )
 		tempRect:setFillColor( 1, 1, 1 )
 		tempRect.strokeWidth = 3
 		tempRect:setStrokeColor( 0, 0, 0)
-		tempText = display.newText( "Coming soon", display.contentCenterX, display.contentCenterY, native.systemFont, 20 )
+		tempText = display.newText( options )
+		tempText:setFillColor( 0, 0, 0 )
 		
-		okButton = widget.newButton
+		yesButton = widget.newButton
 		{
-			label = "Ok",
-			onEvent = handleOkEvent,
+			label = "Yes",
+			onEvent = handleYesEvent,
 			emboss = false,
 			--properties for a rounded rectangle button...
 			shape="roundedRect",
@@ -41,34 +106,31 @@ function handleResetEvent ( event )
 			labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
 			strokeWidth = 2
 		}
-		tempText:setFillColor( 0, 0, 0 )
 		
-		okButton.x = display.contentCenterX
-		okButton.y = display.contentCenterY+40
+		noButton = widget.newButton
+		{
+			label = "No",
+			onEvent = handleNoEvent,
+			emboss = false,
+			--properties for a rounded rectangle button...
+			shape="roundedRect",
+			width = 60,
+			height = 30,
+			font = native.systemFont,
+			cornerRadius = 10,
+			fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+			strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+			labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+			strokeWidth = 2
+		}
+		
+		yesButton.x = display.contentCenterX-60
+		yesButton.y = display.contentCenterY+40
+		noButton.x = display.contentCenterX+60
+		noButton.y = display.contentCenterY+40
 		
 	end
 	return true
-end
-
-function handleOkEvent ( event )
-    if ( "ended" == event.phase ) then
-		tempRect:removeSelf()
-		tempText:removeSelf()
-		okButton:removeSelf()
-	end
-	return true
-end
-
---===============
---SCENE FUNCTIONS
---===============
-function scene:create( event )
-	--init menu-specific variables and audio here
-	--make sure to insert objects into sceneGroup
-	
-	--get our scene view
-    local sceneGroup = self.view
-
 end
 
 function calcTime()
@@ -109,6 +171,17 @@ function calcTime()
 	
 	--now do seconds
 	tempSecond = tempTime/1000
+end
+--===============
+--SCENE FUNCTIONS
+--===============
+function scene:create( event )
+	--init menu-specific variables and audio here
+	--make sure to insert objects into sceneGroup
+	
+	--get our scene view
+    local sceneGroup = self.view
+
 end
 
 function scene:show( event )

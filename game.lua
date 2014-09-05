@@ -20,8 +20,11 @@ local mapSize={}
 local startTime, endTime
 local tempInfected = 0
 local tempLost = 0
+local moveCounter = 0
+local bittenCiv
+local infCounter = 0
+local randomSpawn = 30
 
---!!cannot run a second level after afterscreen
 function detectLevel(init)
 	--check which level player is on and set room variables accordingly
 	if constants.currentLevel == 0 then
@@ -244,6 +247,27 @@ function detectLevel(init)
 	end
 end
 
+function spawnRandom ( event )
+	civilianArray[#civilianArray+1] = { math.random(50, 400), math.random(50, 300) }
+	civilianArray[#civilianArray].lifeLeft = constants.zombieHealth
+end
+
+function eatCivs( event )
+		for i=1,#civilianArray do
+			if i > #civilianArray then --error because we remove a zombie from the array in the middle of the thing
+				print("ERROR: civilianArray > i")
+				else
+				if civilianArray[i].status == "bitten" then
+					civilianArray[i].lifeLeft = civilianArray[i].lifeLeft - 5
+				end
+				if civilianArray[i].lifeLeft < 1 then --turn into zombie
+					bittenCiv = i
+					infectCiv()
+				end
+			end
+		end
+end
+
 function clickCiv( event )
 	if zombieClicks > 0 then
 		--the zombie will be inserted in the next slot in the array, so the zombie count + 1.
@@ -258,9 +282,22 @@ function clickCiv( event )
 		zombieClicks = zombieClicks - 1
 		tempInfected = tempInfected + 1
 	else
-		print("nope lol")
+		print("Cannot infect - no clicks left")
 	end
 	return true
+end
+
+function infectCiv ( event )
+		--the zombie will be inserted in the next slot in the array, so the zombie count + 1.
+		--event.target.arrayNumber is given to the civilians when the map is drawn and is their unique identifier.
+		--add civilian to zombie array
+		print(bittenCiv, "health less than 1, turning")
+			zombieArray[zombieCount+1] = {civilianArray[bittenCiv][1],civilianArray[bittenCiv][2]}
+			--remove it from civilian table
+			table.remove(civilianArray, bittenCiv)
+		--increase zombiecount because there's a zombie now
+		zombieCount = zombieCount + 1
+		tempInfected = tempInfected + 1
 end
 
 function killZombie ( event )
@@ -321,13 +358,144 @@ function moveWorld(event)
     return true
 end
 
+function moveActors( event )
+local civDist = nil
+local civTarget = 0
+local distanceArray = {}
+local distX, distY
+local targetDirection = 0
+local movementX, movementY
+local infectBool
+
+	--!!take all the civilians and move them, not doing that yet, need rooms and shit first
+	--then move the zombies
+	for i=1, #zombieArray do
+		--detect closest civilian
+		for j = 1, #civilianArray do
+			if civDist == nil then
+				civDist = 9999999
+			end
+			--compare distances to all actors			
+			distX = zombieArray[i][1]-civilianArray[j][1]
+			--no negative numbers please	
+			if distX < 0 then
+				distX = distX*-1
+			end
+			--no negative numbers please	
+			distY = zombieArray[i][2]-civilianArray[j][2]
+			if distY < 0 then
+				distY = distY*-1
+			end
+			distanceArray[j] = distX + distY
+			--now check if this one's the closest
+			if distanceArray[j] < civDist then
+				civDist = distanceArray[j]
+				civTarget = j
+				movementX = distX
+				movementY = distY
+				--civDistTemp = 999999999
+				--civTargetTemp = 0
+			end
+			distX = 0
+			distY = 0
+		end
+		print("zombie: ", i, "target: ", civTarget, "distance: ", civDist)
+		--now if we're within 5 units or so we'll set the zombie to infect the civilian on a timer and prevent him from moving
+		if distanceArray[civTarget] < 10 then --circle size is 5, so this is obviously 10 for some reason? will have to change with pinch and zoom
+			civilianArray[civTarget].status = "bitten"
+			infectBool = true --infectBool just stops the dude from moving
+		end
+	
+		--the zombie has acquired the target - move it
+		--first see if it's left or right
+		--target direction is 1 for left, 2 for right, 4 for up and 8 for down
+		--example, left and up would be 5
+		if infectBool == true then
+			--do nothing
+		else
+			if zombieArray[i][1] < civilianArray[civTarget][1] then
+				targetDirection = targetDirection + 2
+			elseif zombieArray[i][1] > civilianArray[civTarget][1] then
+				targetDirection = targetDirection + 1
+			end
+			--see if it's up or down
+			if zombieArray[i][2] > civilianArray[civTarget][2] then
+				targetDirection = targetDirection + 4
+			elseif zombieArray[i][2] < civilianArray[civTarget][2] then
+				targetDirection = targetDirection + 8
+			end
+			--now move up or down depending on targetDirection
+			if targetDirection == 1 then --it's left of the zombie, so move left
+				zombieArray[i][1] = zombieArray[i][1] - 1
+			elseif targetDirection == 2 then --right of the zombie, move right
+				zombieArray[i][1] = zombieArray[i][1] + 1
+			elseif targetDirection == 4 then --move up
+				zombieArray[i][2] = zombieArray[i][2] - 1
+			elseif targetDirection == 5 then --up left
+				if math.random(1, movementX+movementY) > movementY then -- if the random X is bigger we move horizontally, otherwhise we move vertically
+					zombieArray[i][1] = zombieArray[i][1] - 1
+				else
+					zombieArray[i][2] = zombieArray[i][2] - 1
+				end
+			elseif targetDirection == 6 then --up right
+				if math.random(1, movementX+movementY) > movementY then -- see above and figure it out, idiot
+					zombieArray[i][1] = zombieArray[i][1] + 1
+				else
+					zombieArray[i][2] = zombieArray[i][2] - 1
+				end
+			elseif targetDirection == 8 then --DOWN NIGGA
+				zombieArray[i][2] = zombieArray[i][2] + 1
+			elseif targetDirection == 9 then --down left
+				if math.random(1, movementX+movementY) < movementY then -- see above and figure it out, idiot
+					zombieArray[i][1] = zombieArray[i][1] - 1
+				else
+					zombieArray[i][2] = zombieArray[i][2] + 1
+				end
+			elseif targetDirection == 10 then --down right
+				if math.random(1, movementX+movementY) < movementY then -- see above and figure it out, idiot
+					zombieArray[i][1] = zombieArray[i][1] + 1
+				else
+					zombieArray[i][2] = zombieArray[i][2] + 1
+				end
+			end
+		end
+		
+		--and reset these variables too thanks
+		civDist = nil
+		civTarget = 0
+		targetDirection = 0
+		infectBool = false
+	end
+	
+end
+
 function renderOut()
     --first clear your display
     for i=1, #world do
         world[i]:removeSelf()
         world[i]=nil
     end
-
+	--now check to see if the people are about to move
+	if moveCounter == 1 then --!! this is to see how many ticks we trigger this in or whatever
+		moveActors()
+		moveCounter = 0
+		eatCivs()
+	else
+		moveCounter = moveCounter + 1
+	end
+	
+	--!!temporary random spawns for infinity mode
+	if constants.currentLevel == 11 then
+		if infCounter == randomSpawn then
+			spawnRandom()
+			infCounter = 0
+			randomSpawn = math.random(30, 150)
+			print("next zombie in: ", randomSpawn)
+		else
+			infCounter = infCounter + 1
+		end
+	end
+		
 	--inserting the world map
 	levelMap = display.newRect(mapSize[1][1]+(mapSize[1][3]/2),mapSize[1][2]+(mapSize[1][4]/2),mapSize[1][3],mapSize[1][4])
     levelMap.strokeWidth = 4
@@ -425,7 +593,6 @@ function endScene()
 	--update stuff on stats screen
 	constants.totalInfections = constants.totalInfections + tempInfected
 	constants.totalLost = constants.totalLost + tempLost
-		print("templost", constants.totalLost, tempLost)
 	constants.gamesPlayed = constants.gamesPlayed + 1
 	constants.timePlayed = constants.timePlayed + constants.levelTime
 	tempLost = 0
@@ -453,6 +620,9 @@ function scene:show( event )
 			constants.scrollSpeed = 0.05
 		end
 		createRoom(true)
+		for i=1,#civilianArray do
+			civilianArray[i].lifeLeft = constants.zombieHealth
+		end
 		display.setDefault( "background", 0, 0, 0 )
 		zombieCount = 0
 		startTime = system.getTimer()

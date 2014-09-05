@@ -1,22 +1,31 @@
 local rtn={}
+--game settings
 rtn.scrollSpeed = nil
+rtn.counterLocation = "Bottom Right"
+rtn.timerOn = "Timer Shown"
+
+--level progress constants
 rtn.levelCleared = {}
 rtn.infUnlocked = 0
-rtn.counterLocation = "Bottom Right"
+
+--game constants
 rtn.victory = 0
 rtn.levelTime = 0
-rtn.timerOn = "Timer Shown"
 rtn.civsInfected = 0
 rtn.zombiesLost = 0
+rtn.zombieHealth = 50
+rtn.currentLevel = 0
+
+--stats constants
 rtn.totalInfections = 0
 rtn.totalLost = 0
 rtn.gamesPlayed = 0
 rtn.timePlayed = 0
 
+--save game location
 rtn.saveFile = system.pathForFile( "infectzensave.txt", system.DocumentsDirectory)
 
-rtn.currentLevel = 0
-
+--level information
 --tutorial level
 rtn.level0RoomCount = 4
 rtn.level0Size = {}
@@ -25,9 +34,9 @@ rtn.level0RoomX={50, 50, 200, 425}
 rtn.level0RoomY={50, 95, 50, 270}
 rtn.level0RoomW={50, 100, 300, 75}
 rtn.level0RoomH={25, 300, 200, 50}
-rtn.level0CivX={60}
-rtn.level0CivY={60}
-rtn.level0Zombies = 2
+rtn.level0CivX={60, 80, 100, 120, 140, 60, 80, 100, 120, 140, 60, 80, 100, 120, 140, 60, 80, 100, 120, 140}
+rtn.level0CivY={60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 120, 120, 120, 120, 120}
+rtn.level0Zombies = 4
 
 --level 1
 rtn.level1RoomCount = 2
@@ -158,8 +167,8 @@ rtn.level11RoomX={150}
 rtn.level11RoomY={20}
 rtn.level11RoomW={150}
 rtn.level11RoomH={150}
-rtn.level11CivX={160}
-rtn.level11CivY={160}
-rtn.level11Zombies = 1
+rtn.level11CivX={100, 50}
+rtn.level11CivY={100, 50}
+rtn.level11Zombies = 100
 
 return rtn
