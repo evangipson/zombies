@@ -61,17 +61,26 @@ stats can now be reset
 organized constants file
 added temporary infinity mode for testing
 
+v0.11
+improved ai pathing
+civilians now run in the opposite direction if zombies get close
+fixed zombie parkinsons bug
+added doors
+civilians can't pass through walls
+
 -TO DO
 momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
 highscores
-improve AI and pathing
-make walls walls
-make civilians run away
+improve AI and pathing more (civilians just standing by a wall - move to closest corner instead)
 add military
 zombies can't walk through each other
+zombies can't walk through walls
+civs can't walk through each other
+doors have hp, civs pass through
 
 -known bugs:
 * an old save file has a different format and might fuck shit up, need to put in a check for this somehow, count the lines in the file or whatnot
-* sometimes zombies vibrate while looking for a target, i think it's because it's walking between two targets the same distance from each other or it has to do with the logic for moving, they move X or Y depending on a random number. right now they're more likely to move Y than X but i'll fix it.
 * the slider circle for scrollSpeed sometimes goes outside to the left when you first start up the game
+* zombies move up left for some reason, "feature" of erratic behavior
+* civilians run to corners and refuse to run sideways when they hit a wall. oh well, if they want to die that bad...
