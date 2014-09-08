@@ -649,8 +649,7 @@ local targetDoor = false
 							end
 						end
 					end
-				for k=1,roomCount do
-					print("roomcheck")
+					for k=1,roomCount do
 						local upperWall = roomArray[k][2]
 						local lowerWall = roomArray[k][2]+roomArray[k][4]
 						local leftWall = roomArray[k][1]
@@ -682,33 +681,38 @@ local targetDoor = false
 								end
 							end
 							if hitDoor == false then
-								newPosX = civilianArray[i][1]
-								if zombieArray[zombieTarget][2] > newPosY then --see if zombie is above or below
-									newPosY = newPosY - 1
-								elseif zombieArray[zombieTarget][2] < newPosY then
-									newPosY = newPosY + 1
-								else --go to nearest corner
-									if upWallDist > lowWallDist then
-										newPosY = newPosY + 1
-									else
+								if civilianArray[i].currentRoom == 0 then --logic for outside
+							
+									newPosX = civilianArray[i][1]
+									if zombieArray[zombieTarget][2] > newPosY then --see if zombie is above or below
 										newPosY = newPosY - 1
+									elseif zombieArray[zombieTarget][2] < newPosY then
+										newPosY = newPosY + 1
+									else --go to nearest corner
+										if upWallDist > lowWallDist then
+											newPosY = newPosY + 1
+										else
+											newPosY = newPosY - 1
+										end
 									end
-								end
-								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY + 2
+									if (newPosY > upperWall-5 and newPosY < upperWall+5) then
+										if civilianArray[i].currentRoom > 0 then
+											newPosY = newPosY + 2
+										end
+									elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
+										if civilianArray[i].currentRoom > 0 then
+											newPosY = newPosY - 2
+										end
 									end
-								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY - 2
-									end
+								else --logic for inside
+								
 								end
 							else
-								--iif the door IS hit we gotta do something... move as normal? so no change?
+								--do nothing, there's a door
 							end
 						end
 						--check for left wall
-						if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+						if (newPosX > leftWall-1 and newPosX < leftWall+1) then
 							--check if there's a door there
 							for k=1,doorCount do
 								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
@@ -718,28 +722,8 @@ local targetDoor = false
 								end
 							end
 							if hitDoor == false then
-								newPosX = civilianArray[i][1]
-							else
-								if zombieArray[zombieTarget][2] > newPosY then
-									newPosY = newPosY - 1
-								elseif zombieArray[zombieTarget][2] < newPosY then
-									newPosY = newPosY + 1
-								else 
-									if math.random(1,2) == 2 then
-										newPosY = newPosY + 1
-									else
-										newPosY = newPosY - 1
-									end
-								end
-								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY + 2
-									end
-								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY - 2
-									end
-								end
+								
+							
 							end
 						end
 						--check for upper wall
@@ -752,6 +736,7 @@ local targetDoor = false
 									end
 								end
 							end
+							
 							if hitDoor == false then
 								newPosY = civilianArray[i][2]
 								else
@@ -766,7 +751,7 @@ local targetDoor = false
 										newPosX = newPosX - 1
 									end
 								end
-								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
 									if civilianArray[i].currentRoom > 0 then
 										newPosX = newPosX + 2
 									end
@@ -801,7 +786,7 @@ local targetDoor = false
 										newPosX = newPosX - 1
 									end
 								end
-								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
 									if civilianArray[i].currentRoom > 0 then
 										newPosX = newPosX + 2
 									end
@@ -911,7 +896,6 @@ local targetDoor = false
 					--check if the new positions hit a room
 					--remembers rooms draw from top left corner, makes it a lot easier		
 				for k=1,roomCount do
-					print("roomcheck")
 						local upperWall = roomArray[k][2]
 						local lowerWall = roomArray[k][2]+roomArray[k][4]
 						local leftWall = roomArray[k][1]
@@ -969,7 +953,7 @@ local targetDoor = false
 							end
 						end
 						--check for left wall
-						if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+						if (newPosX > leftWall-1 and newPosX < leftWall+1) then
 							--check if there's a door there
 							for k=1,doorCount do
 								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
@@ -1027,7 +1011,7 @@ local targetDoor = false
 										newPosX = newPosX - 1
 									end
 								end
-								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
 									if civilianArray[i].currentRoom > 0 then
 										newPosX = newPosX + 2
 									end
@@ -1062,7 +1046,7 @@ local targetDoor = false
 										newPosX = newPosX - 1
 									end
 								end
-								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
 									if civilianArray[i].currentRoom > 0 then
 										newPosX = newPosX + 2
 									end
