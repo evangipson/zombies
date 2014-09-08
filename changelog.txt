@@ -68,11 +68,15 @@ fixed zombie parkinsons bug
 added doors
 civilians can't pass through walls
 
+v0.12
+assigned doors to rooms (doorArray.room)
+civilians now run to doors to hide in rooms
+
 -TO DO
 momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
 highscores
-improve AI and pathing more (civilians just standing by a wall - move to closest corner instead)
+improve AI and pathing more (civilians just standing by a wall - move to closest corner instead of random up/down movement)
 add military
 zombies can't walk through each other
 zombies can't walk through walls
@@ -84,3 +88,4 @@ doors have hp, civs pass through
 * the slider circle for scrollSpeed sometimes goes outside to the left when you first start up the game
 * zombies move up left for some reason, "feature" of erratic behavior
 * civilians run to corners and refuse to run sideways when they hit a wall. oh well, if they want to die that bad...
+* scrolling lets people walk through walls

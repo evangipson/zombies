@@ -9,9 +9,11 @@ local roomX={}
 local roomY={}
 local roomW={}
 local roomH={}
+local doorArray={}
 local doorX={}
 local doorY={}
 local doorType={}
+local doorRoom={}
 local civilianArray = {}
 local civCircles = {}
 local zombieArray = {}
@@ -48,6 +50,7 @@ function detectLevel(init)
 			doorX[i] = constants.level0DoorX[i]
 			doorY[i] = constants.level0DoorY[i]
 			doorType[i] = constants.level0DoorType[i]
+			doorRoom[i] = constants.level0DoorRoom[i]
 			--!!need to add doorType for the other levels but i'm lazy now
 		end
 		--add civilian locations
@@ -74,6 +77,7 @@ function detectLevel(init)
 			doorX[i] = constants.level1DoorX[i]
 			doorY[i] = constants.level1DoorY[i]
 			doorType[i] = constants.level1DoorType[i]
+			doorRoom[i] = constants.level1DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level1CivX
@@ -99,6 +103,7 @@ function detectLevel(init)
 			doorX[i] = constants.level2DoorX[i]
 			doorY[i] = constants.level2DoorY[i]
 			doorType[i] = constants.level2DoorType[i]
+			doorRoom[i] = constants.level2DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level2CivX
@@ -124,6 +129,7 @@ function detectLevel(init)
 			doorX[i] = constants.level3DoorX[i]
 			doorY[i] = constants.level3DoorY[i]
 			doorType[i] = constants.level3DoorType[i]
+			doorRoom[i] = constants.level3DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level3CivX
@@ -149,6 +155,7 @@ function detectLevel(init)
 			doorX[i] = constants.level4DoorX[i]
 			doorY[i] = constants.level4DoorY[i]
 			doorType[i] = constants.level4DoorType[i]
+			doorRoom[i] = constants.level4DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level4CivX
@@ -174,6 +181,7 @@ function detectLevel(init)
 			doorX[i] = constants.level5DoorX[i]
 			doorY[i] = constants.level5DoorY[i]
 			doorType[i] = constants.level5DoorType[i]
+			doorRoom[i] = constants.level5DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level5CivX
@@ -199,6 +207,7 @@ function detectLevel(init)
 			doorX[i] = constants.level6DoorX[i]
 			doorY[i] = constants.level6DoorY[i]
 			doorType[i] = constants.level6DoorType[i]
+			doorRoom[i] = constants.level6DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level6CivX
@@ -224,6 +233,7 @@ function detectLevel(init)
 			doorX[i] = constants.level7DoorX[i]
 			doorY[i] = constants.level7DoorY[i]
 			doorType[i] = constants.level7DoorType[i]
+			doorRoom[i] = constants.level7DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level7CivX
@@ -249,6 +259,7 @@ function detectLevel(init)
 			doorX[i] = constants.level8DoorX[i]
 			doorY[i] = constants.level8DoorY[i]
 			doorType[i] = constants.level8DoorType[i]
+			doorRoom[i] = constants.level8DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level8CivX
@@ -274,6 +285,7 @@ function detectLevel(init)
 			doorX[i] = constants.level9DoorX[i]
 			doorY[i] = constants.level9DoorY[i]
 			doorType[i] = constants.level9DoorType[i]
+			doorRoom[i] = constants.level9DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level9CivX
@@ -299,6 +311,7 @@ function detectLevel(init)
 			doorX[i] = constants.level10DoorX[i]
 			doorY[i] = constants.level10DoorY[i]
 			doorType[i] = constants.level10DoorType[i]
+			doorRoom[i] = constants.level10DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level10CivX
@@ -325,6 +338,7 @@ function detectLevel(init)
 			doorX[i] = constants.level11DoorX[i]
 			doorY[i] = constants.level11DoorY[i]
 			doorType[i] = constants.level11DoorType[i]
+			doorRoom[i] = constants.level11DoorRoom[i]
 		end
 		--add civilian locations
 		civCount = #constants.level11CivX
@@ -456,13 +470,20 @@ end
 function moveCivs( event )
 local zombieDist = nil
 local zombieTarget = 0
-local distanceArray = {}
-local distX, distY
 local zombieDirection = 0
+local distX, distY
+local distanceArray = {}
+local doorDist = nil
+local doorTarget = 0
+local doorDirection = 0
+local doorDistArray = {}
+local doorDistX, doorDistY
 local movementX, movementY
+local doorMovementX, doorMovementY
 local infectBool
 local newPosX, newPosY
 local hitDoor = false
+local targetDoor = false
 	--first check if there even are zombies
 	if zombieCount > 0 then
 		for i=1, #civilianArray do
@@ -498,12 +519,305 @@ local hitDoor = false
 					distX = 0
 					distY = 0
 				end
-				--and move
-				--print("civilian: ", i, "target: ", zombieTarget, "distance: ", zombieDist)
-				--now we found the closest one. if he's more than 50 units away, then civilian won't move
+				--now see if there's a door within range if the civ is outside
+				if civilianArray[i].currentRoom == 0 then --find closest door
+					for m=1,#doorArray do
+						if doorDist == nil then
+							doorDist = 999999
+						end
+						--compare distances to all zombie actors
+						doorDistX = civilianArray[i][1]-doorArray[m].x
+						--no negative numbers please	
+						if doorDistX < 0 then
+							doorDistX = doorDistX*-1
+						end
+						doorDistY = civilianArray[i][2]-doorArray[m].y
+						--no negative numbers please
+						if doorDistY < 0 then
+							doorDistY = doorDistY*-1
+						end
+						doorDistArray[m] = doorDistX + doorDistY
+						--now we have the distance, see if it's the closest
+						if doorDistArray[m] < doorDist then
+							doorDist = doorDistArray[m]
+							doorTarget = m
+							if (doorDist < 50 and doorDist > 2) then
+								doorMovementX = doorDistX
+								doorMovementY = doorDistY
+								targetDoor = true
+							end
+						end
+						--if the door is less than 3 units away, target the room instead
+						if doorDist < 3 then
+							doorMovementX = civilianArray[i][1] - roomArray[doorArray[doorTarget].room][1]
+							if doorMovementX < 0 then
+								doorMovementX = doorMovementX*-1
+							end
+							doorMovementY = civilianArray[i][2] - roomArray[doorArray[doorTarget].room][2]
+							if doorMovementY < 0 then
+								doorMovementY = doorMovementX*-1
+							end
+						end
+						doorDistX = 0
+						doorDistY = 0
+					end
+				end
+				--now we found the closest zombie and door. if zombie is more than 50 units away, then civilian won't move
 				if zombieDist > 50 then
 					--do nothing
-				else --find target direction and run away
+				elseif targetDoor == true then --move towards that door it saw
+					--find door direction and move that way	
+					newPosX = civilianArray[i][1]
+					newPosY = civilianArray[i][2]
+					if civilianArray[i][1] < doorArray[doorTarget].x then
+						doorDirection = doorDirection + 2
+					elseif civilianArray[i][1] > doorArray[doorTarget].x then
+						doorDirection = doorDirection + 1
+					end
+					--see if it's up or down
+					if civilianArray[i][2] < doorArray[doorTarget].y then
+						doorDirection = doorDirection + 8
+					elseif civilianArray[i][2] > doorArray[doorTarget].y then
+						doorDirection = doorDirection + 4
+					end	
+					--now we have the direction! now we move towards the door
+					if doorDirection == 1 then --door is to the left, move left
+						newPosX = civilianArray[i][1] - 1
+					elseif doorDirection == 2 then --door is to the right, move right
+						newPosX = civilianArray[i][1] + 1
+					elseif doorDirection == 4 then --guess idiot
+						newPosY = civilianArray[i][2] - 1
+					elseif doorDirection == 8 then --you're stupid
+						newPosY = civilianArray[i][2] + 1
+					elseif doorDirection == 5 then --5 would be up left
+						for j=1,2 do
+							if doorMovementX > doorMovementY then
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+									newPosX = civilianArray[i][1] - 1
+								else
+									newPosY = civilianArray[i][2] - 1
+								end
+							end
+						end
+						--correct so far
+					elseif doorDirection == 6 then --up right
+						for j=1,2 do
+							if doorMovementX > doorMovementY then
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+									newPosX = civilianArray[i][1] + 1
+								else
+									newPosY = civilianArray[i][2] - 1
+								end
+							else
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementY then
+									newPosY = civilianArray[i][2] - 1
+								else
+									newPosX = civilianArray[i][1] + 1
+								end
+							end
+						end
+					elseif doorDirection == 9 then --down left
+						for j=1,2 do
+							if doorMovementX > doorMovementY then
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+									newPosX = civilianArray[i][1] - 1
+								else
+									newPosY = civilianArray[i][2] + 1
+								end
+							else
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementY then
+									newPosY = civilianArray[i][2] + 1
+								else
+									newPosX = civilianArray[i][1] - 1
+								end
+							end
+						end
+					elseif doorDirection == 10 then --down right
+						for j=1,2 do
+							if doorMovementX > doorMovementY then
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+									newPosX = civilianArray[i][1] + 1
+								else
+									newPosY = civilianArray[i][2] + 1
+								end
+							else
+								if math.random(1, doorMovementX+doorMovementY) < doorMovementY then
+									newPosY = civilianArray[i][2] + 1
+								else
+									newPosX = civilianArray[i][1] + 1
+								end
+							end
+						end
+					end
+				for k=1,roomCount do
+					print("roomcheck")
+						local upperWall = roomArray[k][2]
+						local lowerWall = roomArray[k][2]+roomArray[k][4]
+						local leftWall = roomArray[k][1]
+						local rightWall = roomArray[k][1]+roomArray[k][3]
+						local upWallDist = upperWall - civilianArray[i][2]
+						local lowWallDist = upperWall - civilianArray[i][2]
+						local leftWallDist = upperWall - civilianArray[i][1]
+						local rightWallDist = upperWall - civilianArray[i][1]
+						if upWallDist < 0 then 
+							upWallDist = upWallDist*-1
+						end
+						if lowWallDist < 0 then 
+							lowWallDist = lowWallDist*-1
+						end
+						if leftWallDist < 0 then 
+							leftWallDist = leftWallDist*-1
+						end
+						if rightWallDist < 0 then 
+							rightWallDist = rightWallDist*-1
+						end
+						--check for right wall
+						if (newPosX > rightWall-5 and newPosX < rightWall+5) then
+							--check if there's a door there
+							for k=1,doorCount do
+								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
+									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
+										hitDoor = true
+									end
+								end
+							end
+							if hitDoor == false then
+								newPosX = civilianArray[i][1]
+								if zombieArray[zombieTarget][2] > newPosY then --see if zombie is above or below
+									newPosY = newPosY - 1
+								elseif zombieArray[zombieTarget][2] < newPosY then
+									newPosY = newPosY + 1
+								else --go to nearest corner
+									if upWallDist > lowWallDist then
+										newPosY = newPosY + 1
+									else
+										newPosY = newPosY - 1
+									end
+								end
+								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY + 2
+									end
+								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY - 2
+									end
+								end
+							else
+								--iif the door IS hit we gotta do something... move as normal? so no change?
+							end
+						end
+						--check for left wall
+						if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+							--check if there's a door there
+							for k=1,doorCount do
+								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
+									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
+										hitDoor = true
+									end
+								end
+							end
+							if hitDoor == false then
+								newPosX = civilianArray[i][1]
+							else
+								if zombieArray[zombieTarget][2] > newPosY then
+									newPosY = newPosY - 1
+								elseif zombieArray[zombieTarget][2] < newPosY then
+									newPosY = newPosY + 1
+								else 
+									if math.random(1,2) == 2 then
+										newPosY = newPosY + 1
+									else
+										newPosY = newPosY - 1
+									end
+								end
+								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY + 2
+									end
+								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY - 2
+									end
+								end
+							end
+						end
+						--check for upper wall
+						if (newPosY > upperWall-5 and newPosY < upperWall+5) then
+							--check if there's a door there
+							for k=1,doorCount do
+								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
+									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
+										hitDoor = true
+									end
+								end
+							end
+							if hitDoor == false then
+								newPosY = civilianArray[i][2]
+								else
+								if zombieArray[zombieTarget][1] > newPosX then
+									newPosX = newPosX - 1
+								elseif zombieArray[zombieTarget][2] < newPosX then
+									newPosX = newPosX + 1
+								else 
+									if math.random(1,2) == 2 then
+										newPosX = newPosX + 1
+									else
+										newPosX = newPosX - 1
+									end
+								end
+								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX + 2
+									end
+								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX - 2
+									end
+								end
+							end
+						end
+						--check for lower wall
+						if (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
+							--check if there's a door there
+							for k=1,doorCount do
+								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
+									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
+										hitDoor = true
+									end
+								end
+							end
+							if hitDoor == false then
+								newPosY = civilianArray[i][2]
+							else
+								if zombieArray[zombieTarget][1] > newPosX then
+									newPosX = newPosX - 1
+								elseif zombieArray[zombieTarget][2] < newPosX then
+									newPosX = newPosX + 1
+								else 
+									if math.random(1,2) == 2 then
+										newPosX = newPosX + 1
+									else
+										newPosX = newPosX - 1
+									end
+								end
+								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX + 2
+									end
+								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX - 2
+									end
+								end
+							end
+						end
+					end
+					--this is where we move the civilians to the new positions
+					civilianArray[i][1] = newPosX
+					civilianArray[i][2] = newPosY
+				else
+					--find zombie direction and run away
 					--first see if it's left or right
 					--target direction is 1 for left, 2 for right, 4 for up and 8 for down
 					--example, left and up would be 5
@@ -595,14 +909,29 @@ local hitDoor = false
 						end
 					end
 					--check if the new positions hit a room
-					--remembers rooms draw from top left corner, makes it a lot easier
-					for k=1,roomCount do
+					--remembers rooms draw from top left corner, makes it a lot easier		
+				for k=1,roomCount do
+					print("roomcheck")
 						local upperWall = roomArray[k][2]
 						local lowerWall = roomArray[k][2]+roomArray[k][4]
 						local leftWall = roomArray[k][1]
 						local rightWall = roomArray[k][1]+roomArray[k][3]
-						--print(leftWall, upperWall, rightWall, lowerWall)
-						--print(zombieArray[1][1], zombieArray[1][2])
+						local upWallDist = upperWall - civilianArray[i][2]
+						local lowWallDist = upperWall - civilianArray[i][2]
+						local leftWallDist = upperWall - civilianArray[i][1]
+						local rightWallDist = upperWall - civilianArray[i][1]
+						if upWallDist < 0 then 
+							upWallDist = upWallDist*-1
+						end
+						if lowWallDist < 0 then 
+							lowWallDist = lowWallDist*-1
+						end
+						if leftWallDist < 0 then 
+							leftWallDist = leftWallDist*-1
+						end
+						if rightWallDist < 0 then 
+							rightWallDist = rightWallDist*-1
+						end
 						--check for right wall
 						if (newPosX > rightWall-5 and newPosX < rightWall+5) then
 							--check if there's a door there
@@ -615,23 +944,28 @@ local hitDoor = false
 							end
 							if hitDoor == false then
 								newPosX = civilianArray[i][1]
-							else
-								if zombieArray[zombieTarget][2] > newPosY then
+								if zombieArray[zombieTarget][2] > newPosY then --see if zombie is above or below
 									newPosY = newPosY - 1
 								elseif zombieArray[zombieTarget][2] < newPosY then
 									newPosY = newPosY + 1
-								else 
-									if math.random(1,2) == 2 then
+								else --go to nearest corner
+									if upWallDist > lowWallDist then
 										newPosY = newPosY + 1
 									else
 										newPosY = newPosY - 1
 									end
 								end
 								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-									newPosY = newPosY + 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY + 2
+									end
 								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-									newPosY = newPosY - 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY - 2
+									end
 								end
+							else
+								--iif the door IS hit we gotta do something... move as normal? so no change?
 							end
 						end
 						--check for left wall
@@ -659,9 +993,13 @@ local hitDoor = false
 									end
 								end
 								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-									newPosY = newPosY + 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY + 2
+									end
 								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-									newPosY = newPosY - 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosY = newPosY - 2
+									end
 								end
 							end
 						end
@@ -690,9 +1028,13 @@ local hitDoor = false
 									end
 								end
 								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
-									newPosX = newPosX + 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX + 2
+									end
 								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
-									newPosX = newPosX - 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX - 2
+									end
 								end
 							end
 						end
@@ -721,9 +1063,13 @@ local hitDoor = false
 									end
 								end
 								if (newPosX > leftWall-5 and newPosX < leftWall+5) then
-									newPosX = newPosX + 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX + 2
+									end
 								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
-									newPosX = newPosX - 2
+									if civilianArray[i].currentRoom > 0 then
+										newPosX = newPosX - 2
+									end
 								end
 							end
 						end
@@ -737,6 +1083,10 @@ local hitDoor = false
 		zombieDist = nil
 		zombieTarget = 0
 		zombieDirection = 0
+		doorDist = nil
+		doorTarget = 0
+		doorDirection = 0
+		targetDoor = false
 		end
 	end
 end
@@ -786,14 +1136,13 @@ local infectBool
 			civilianArray[civTarget].status = "bitten"
 			infectBool = true --infectBool just stops the dude from moving
 		end
-	
 		--the zombie has acquired the target - move it
 		--first see if it's left or right
 		--target direction is 1 for left, 2 for right, 4 for up and 8 for down
 		--example, left and up would be 5
 		if infectBool == true then
 			--do nothing
-		else
+		else --!!there's a door within range
 			if zombieArray[i][1] < civilianArray[civTarget][1] then
 				targetDirection = targetDirection + 2
 			elseif zombieArray[i][1] > civilianArray[civTarget][1] then
@@ -898,7 +1247,7 @@ function renderOut()
         world[i]=nil
     end
 	--now check to see if the people are about to move
-	if moveCounter == 1 then --!! this is to see how many ticks we trigger this in or whatever
+	if moveCounter == 3	then --!! this is to see how many ticks we trigger this in or whatever
 		moveZombies()
 		eatCivs()
 		moveCounter = 0
@@ -943,13 +1292,14 @@ function renderOut()
 	--add the doors
 	for i=1,doorCount do
 		if doorType[i] == "V" then --draw a vertical door
-			myDoor = display.newRect(doorX[i], doorY[i], 5, 20)
+			doorArray[i] = display.newRect(doorX[i], doorY[i], 5, 20)
 		else --draw a horizontal door
-			myDoor = display.newRect(doorX[i], doorY[i], 20, 5)
+			doorArray[i] = display.newRect(doorX[i], doorY[i], 20, 5)
 		end
-		myDoor.strokeWidth = 0
-		myDoor:setFillColor( 0.6, 0.25, 0 )
-		table.insert(world,myDoor)
+		doorArray[i].strokeWidth = 0
+		doorArray[i]:setFillColor( 0.6, 0.25, 0 )
+		doorArray[i].room = doorRoom[i]
+		table.insert(world,doorArray[i])
 	end
 	
 	--insert civilians
@@ -1140,6 +1490,9 @@ function scene:hide( event )
 	end
 	for i=1,#doorY do
 		table.remove(doorY)
+	end
+	for i=1,#doorArray do
+		table.remove(doorArray)
 	end
 	elseif ( phase == "did" ) then
         --not much to do here, except force removal of the scene after it transitions of screen for optimization.
