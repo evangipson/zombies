@@ -55,8 +55,8 @@ rtn.level1DoorX={75}
 rtn.level1DoorY={50}
 rtn.level1DoorType={"H"}
 rtn.level1DoorRoom={1}
-rtn.level1CivX={120, 160, 400}
-rtn.level1CivY={73, 73, 300}
+rtn.level1CivX={120, 140, 400}
+rtn.level1CivY={60, 80, 300}
 rtn.level1Zombies = 1
 
 --level 2
@@ -67,7 +67,7 @@ rtn.level2RoomX={150}
 rtn.level2RoomY={50}
 rtn.level2RoomW={50}
 rtn.level2RoomH={50}
-rtn.level2DoorX={50} 
+rtn.level2DoorX={50}
 rtn.level2DoorY={50}
 rtn.level2DoorType={"V"}
 rtn.level2DoorRoom={1}

@@ -72,6 +72,11 @@ v0.12
 assigned doors to rooms (doorArray.room)
 civilians now run to doors to hide in rooms
 
+v0.13
+made walls into own arrays for pathing (leftWallArray etc)
+assigned walls to rooms (leftWallArray.room)
+rewrote wall logic - civilians now definitely can't pass through walls
+
 -TO DO
 momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
@@ -89,3 +94,4 @@ doors have hp, civs pass through
 * zombies move up left for some reason, "feature" of erratic behavior
 * civilians run to corners and refuse to run sideways when they hit a wall. oh well, if they want to die that bad...
 * scrolling lets people walk through walls
+* civilians get stuck on corners when trying to get to a door

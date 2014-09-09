@@ -9,6 +9,10 @@ local roomX={}
 local roomY={}
 local roomW={}
 local roomH={}
+local leftWallArray = {}
+local rightWallArray = {}
+local upperWallArray = {}
+local lowerWallArray = {}
 local doorArray={}
 local doorX={}
 local doorY={}
@@ -484,6 +488,7 @@ local infectBool
 local newPosX, newPosY
 local hitDoor = false
 local targetDoor = false
+local civDirection
 	--first check if there even are zombies
 	if zombieCount > 0 then
 		for i=1, #civilianArray do
@@ -649,150 +654,95 @@ local targetDoor = false
 							end
 						end
 					end
-					for k=1,roomCount do
-						local upperWall = roomArray[k][2]
-						local lowerWall = roomArray[k][2]+roomArray[k][4]
-						local leftWall = roomArray[k][1]
-						local rightWall = roomArray[k][1]+roomArray[k][3]
-						local upWallDist = upperWall - civilianArray[i][2]
-						local lowWallDist = upperWall - civilianArray[i][2]
-						local leftWallDist = upperWall - civilianArray[i][1]
-						local rightWallDist = upperWall - civilianArray[i][1]
-						if upWallDist < 0 then 
-							upWallDist = upWallDist*-1
-						end
-						if lowWallDist < 0 then 
-							lowWallDist = lowWallDist*-1
-						end
-						if leftWallDist < 0 then 
-							leftWallDist = leftWallDist*-1
-						end
-						if rightWallDist < 0 then 
-							rightWallDist = rightWallDist*-1
-						end
-						--check for right wall
-						if (newPosX > rightWall-5 and newPosX < rightWall+5) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
-								end
-							end
-							if hitDoor == false then
-								if civilianArray[i].currentRoom == 0 then --logic for outside
-							
-									newPosX = civilianArray[i][1]
-									if zombieArray[zombieTarget][2] > newPosY then --see if zombie is above or below
-										newPosY = newPosY - 1
-									elseif zombieArray[zombieTarget][2] < newPosY then
+					--new direction set
+					--check if the new positions hit a room
+					--remembers rooms draw from top left corner, makes it a lot easier	
+					if newPosX ~= civilianArray[i][1] then --start with moving X axis and checking left and right walls
+						for k=1, roomCount do
+							if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then --check for right X wise
+								if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then --check for right wall Y wise
+									--wall is hit
+									newPosX = civilianArray[i][1] --stop civ from moving X wise
+									if civilianArray[i][2] > doorArray[doorTarget].y then --zombie is at least slightly above
 										newPosY = newPosY + 1
-									else --go to nearest corner
-										if upWallDist > lowWallDist then
-											newPosY = newPosY + 1
-										else
-											newPosY = newPosY - 1
+									else --!!nearest corner next
+										newPosY = newPosY - 1
+									end
+									--now just to make sure we didn't hit another wall
+									if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+										if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
 										end
 									end
-									if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-										if civilianArray[i].currentRoom > 0 then
-											newPosY = newPosY + 2
-										end
-									elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-										if civilianArray[i].currentRoom > 0 then
-											newPosY = newPosY - 2
+									if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+										if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
 										end
 									end
-								else --logic for inside
-								
 								end
-							else
-								--do nothing, there's a door
+							elseif (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then --check for left X wise
+								if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then --check for left wall Y wise
+									--wall is hit
+									newPosX = civilianArray[i][1] --stop civ from moving X wise
+									if civilianArray[i][2] > doorArray[doorTarget].y then --zombie is at least slightly above
+										newPosY = newPosY + 1
+									else --!!nearest corner next
+										newPosY = newPosY - 1
+									end
+									--now just to make sure we didn't hit another wall
+									if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+										if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
+										end
+									end
+									if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+										if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
+										end
+									end
+								end	
 							end
 						end
-						--check for left wall
-						if (newPosX > leftWall-1 and newPosX < leftWall+1) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
+					end
+					if newPosY ~= civilianArray[i][2] then --check Y axis
+						for k=1, roomCount do
+							if (newPosY < upperWallArray[k][2]+5 and newPosY > upperWallArray[k][2]-5) then
+								if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+									newPosY = civilianArray[i][2] --stop movement that way
 								end
-							end
-							if hitDoor == false then
-								
-							
-							end
-						end
-						--check for upper wall
-						if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
-								end
-							end
-							
-							if hitDoor == false then
-								newPosY = civilianArray[i][2]
-								else
-								if zombieArray[zombieTarget][1] > newPosX then
-									newPosX = newPosX - 1
-								elseif zombieArray[zombieTarget][2] < newPosX then
+								if civilianArray[i][1] > doorArray[doorTarget].x then --zombie is at least slightly above
 									newPosX = newPosX + 1
-								else 
-									if math.random(1,2) == 2 then
-										newPosX = newPosX + 1
-									else
-										newPosX = newPosX - 1
-									end
-								end
-								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX + 2
-									end
-								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX - 2
-									end
-								end
-							end
-						end
-						--check for lower wall
-						if (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
-								end
-							end
-							if hitDoor == false then
-								newPosY = civilianArray[i][2]
-							else
-								if zombieArray[zombieTarget][1] > newPosX then
+								else --!!nearest corner next
 									newPosX = newPosX - 1
-								elseif zombieArray[zombieTarget][2] < newPosX then
-									newPosX = newPosX + 1
-								else 
-									if math.random(1,2) == 2 then
-										newPosX = newPosX + 1
-									else
-										newPosX = newPosX - 1
+								end
+								--now just to make sure we didn't hit another wall
+								if (newPosX < rightWallArray[k][1]+5 and newPosY > rightWallArray[k][1]-5) then
+									if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
 									end
 								end
-								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX + 2
+								if (newPosX < leftWallArray[k][1]+5 and newPosY > leftWallArray[k][1]-5) then
+									if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
 									end
-								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX - 2
+								end
+							elseif (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+								if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+									newPosY = civilianArray[i][2] --stop movement that way
+								end
+								if civilianArray[i][1] > doorArray[doorTarget].x then --zombie is at least slightly above
+									newPosX = newPosX + 1
+								else --!!nearest corner next
+									newPosX = newPosX - 1
+								end
+								if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
+									if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
+									end
+								end
+								if (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then
+									if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
 									end
 								end
 							end
@@ -894,165 +844,93 @@ local targetDoor = false
 						end
 					end
 					--check if the new positions hit a room
-					--remembers rooms draw from top left corner, makes it a lot easier		
-				for k=1,roomCount do
-						local upperWall = roomArray[k][2]
-						local lowerWall = roomArray[k][2]+roomArray[k][4]
-						local leftWall = roomArray[k][1]
-						local rightWall = roomArray[k][1]+roomArray[k][3]
-						local upWallDist = upperWall - civilianArray[i][2]
-						local lowWallDist = upperWall - civilianArray[i][2]
-						local leftWallDist = upperWall - civilianArray[i][1]
-						local rightWallDist = upperWall - civilianArray[i][1]
-						if upWallDist < 0 then 
-							upWallDist = upWallDist*-1
-						end
-						if lowWallDist < 0 then 
-							lowWallDist = lowWallDist*-1
-						end
-						if leftWallDist < 0 then 
-							leftWallDist = leftWallDist*-1
-						end
-						if rightWallDist < 0 then 
-							rightWallDist = rightWallDist*-1
-						end
-						--check for right wall
-						if (newPosX > rightWall-5 and newPosX < rightWall+5) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
-								end
-							end
-							if hitDoor == false then
-								newPosX = civilianArray[i][1]
-								if zombieArray[zombieTarget][2] > newPosY then --see if zombie is above or below
-									newPosY = newPosY - 1
-								elseif zombieArray[zombieTarget][2] < newPosY then
-									newPosY = newPosY + 1
-								else --go to nearest corner
-									if upWallDist > lowWallDist then
+					--remembers rooms draw from top left corner, makes it a lot easier	
+					if newPosX ~= civilianArray[i][1] then --start with moving X axis and checking left and right walls
+						for k=1, roomCount do
+							if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then --check for right X wise
+								if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then --check for right wall Y wise
+									--wall is hit
+									newPosX = civilianArray[i][1] --stop civ from moving X wise
+									if civilianArray[i][2] > zombieArray[zombieTarget][2] then --zombie is at least slightly above
 										newPosY = newPosY + 1
-									else
+									else --!!nearest corner next
 										newPosY = newPosY - 1
 									end
-								end
-								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY + 2
+									--now just to make sure we didn't hit another wall
+									if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+										if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
+										end
 									end
-								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY - 2
-									end
-								end
-							else
-								--iif the door IS hit we gotta do something... move as normal? so no change?
-							end
-						end
-						--check for left wall
-						if (newPosX > leftWall-1 and newPosX < leftWall+1) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
+									if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+										if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
+										end
 									end
 								end
-							end
-							if hitDoor == false then
-								newPosX = civilianArray[i][1]
-							else
-								if zombieArray[zombieTarget][2] > newPosY then
-									newPosY = newPosY - 1
-								elseif zombieArray[zombieTarget][2] < newPosY then
-									newPosY = newPosY + 1
-								else 
-									if math.random(1,2) == 2 then
+							elseif (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then --check for left X wise
+								if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then --check for left wall Y wise
+									--wall is hit
+									newPosX = civilianArray[i][1] --stop civ from moving X wise
+									if civilianArray[i][2] > zombieArray[zombieTarget][2] then --zombie is at least slightly above
 										newPosY = newPosY + 1
-									else
+									else --!!nearest corner next
 										newPosY = newPosY - 1
 									end
-								end
-								if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY + 2
+									--now just to make sure we didn't hit another wall
+									if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+										if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
+										end
 									end
-								elseif (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosY = newPosY - 2
+									if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+										if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+											newPosY = civilianArray[i][2]
+										end
 									end
-								end
+								end	
 							end
 						end
-						--check for upper wall
-						if (newPosY > upperWall-5 and newPosY < upperWall+5) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
+					end
+					if newPosY ~= civilianArray[i][2] then --check Y axis
+						for k=1, roomCount do
+							if (newPosY < upperWallArray[k][2]+5 and newPosY > upperWallArray[k][2]-5) then
+								if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+									newPosY = civilianArray[i][2] --stop movement that way
 								end
-							end
-							if hitDoor == false then
-								newPosY = civilianArray[i][2]
-								else
-								if zombieArray[zombieTarget][1] > newPosX then
-									newPosX = newPosX - 1
-								elseif zombieArray[zombieTarget][2] < newPosX then
+								if civilianArray[i][1] > zombieArray[zombieTarget][1] then --zombie is at least slightly above
 									newPosX = newPosX + 1
-								else 
-									if math.random(1,2) == 2 then
-										newPosX = newPosX + 1
-									else
-										newPosX = newPosX - 1
-									end
-								end
-								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX + 2
-									end
-								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX - 2
-									end
-								end
-							end
-						end
-						--check for lower wall
-						if (newPosY > lowerWall-5 and newPosY < lowerWall+5) then
-							--check if there's a door there
-							for k=1,doorCount do
-								if (newPosY > doorY[k]-10 and newPosY < doorY[k]+10) then
-									if (newPosX > doorX[k]-10 and newPosX < doorX[k]+10) then --make sure civ is within 10 units of door x wise
-										hitDoor = true
-									end
-								end
-							end
-							if hitDoor == false then
-								newPosY = civilianArray[i][2]
-							else
-								if zombieArray[zombieTarget][1] > newPosX then
+								else --!!nearest corner next
 									newPosX = newPosX - 1
-								elseif zombieArray[zombieTarget][2] < newPosX then
-									newPosX = newPosX + 1
-								else 
-									if math.random(1,2) == 2 then
-										newPosX = newPosX + 1
-									else
-										newPosX = newPosX - 1
+								end
+								--now just to make sure we didn't hit another wall
+								if (newPosX < rightWallArray[k][1]+5 and newPosY > rightWallArray[k][1]-5) then
+									if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
 									end
 								end
-								if (newPosX > leftWall-1 and newPosX < leftWall+1) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX + 2
+								if (newPosX < leftWallArray[k][1]+5 and newPosY > leftWallArray[k][1]-5) then
+									if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
 									end
-								elseif (newPosX > rightWall-5 and newPosX < rightWall+5) then
-									if civilianArray[i].currentRoom > 0 then
-										newPosX = newPosX - 2
+								end
+							elseif (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+								if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+									newPosY = civilianArray[i][2] --stop movement that way
+								end
+								if civilianArray[i][1] > zombieArray[zombieTarget][1] then --zombie is at least slightly above
+									newPosX = newPosX + 1
+								else --!!nearest corner next
+									newPosX = newPosX - 1
+								end
+								if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
+									if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
+									end
+								end
+								if (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then
+									if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+										newPosX = civilianArray[i][1]
 									end
 								end
 							end
@@ -1219,6 +1097,7 @@ local infectBool
 		--and reset these variables too thanks
 		civDist = nil
 		civTarget = 0
+		civDirection = 0
 		targetDirection = 0
 		infectBool = false
 	end
@@ -1231,7 +1110,7 @@ function renderOut()
         world[i]=nil
     end
 	--now check to see if the people are about to move
-	if moveCounter == 3	then --!! this is to see how many ticks we trigger this in or whatever
+	if moveCounter == 1	then --!! this is to see how many ticks we trigger this in or whatever
 		moveZombies()
 		eatCivs()
 		moveCounter = 0
@@ -1272,6 +1151,19 @@ function renderOut()
         myRectangle:setFillColor(  0.52, 0.81, 0.93  )
         myRectangle:setStrokeColor( 0 )
         table.insert(world,myRectangle)
+		--wall array is start x, start y, end x, end y and length
+		leftWallArray[i] = {roomArray[i][1], roomArray[i][2], roomArray[i][1], roomArray[i][2]+roomArray[i][4], roomArray[i][4]}
+		rightWallArray[i] = {roomArray[i][1]+roomArray[i][3], roomArray[i][2], roomArray[i][1]+roomArray[i][3], roomArray[i][2]+roomArray[i][4], roomArray[i][4]}
+		upperWallArray[i] = {roomArray[i][1], roomArray[i][2], roomArray[i][1]+roomArray[i][3], roomArray[i][2], roomArray[i][3]}
+		lowerWallArray[i] = {roomArray[i][1], roomArray[i][2]+roomArray[i][4], roomArray[i][1]+roomArray[i][3], roomArray[i][2]+roomArray[i][4], roomArray[i][3]}
+		leftWallArray[i].room = i
+		rightWallArray[i].room = i
+		upperWallArray[i].room = i
+		lowerWallArray[i].room = i
+		--[[print("left wall", leftWallArray[1][1], leftWallArray[1][2], leftWallArray[1][3], leftWallArray[1][4], leftWallArray[1][5], leftWallArray[i].room)
+		print("right wall", rightWallArray[1][1], rightWallArray[1][2], rightWallArray[1][3], rightWallArray[1][4], rightWallArray[1][5], rightWallArray[i].room)
+		print("upper wall", upperWallArray[1][1], upperWallArray[1][2], upperWallArray[1][3], upperWallArray[1][4], upperWallArray[1][5], upperWallArray[i].room)
+		print("lower wall", lowerWallArray[1][1], lowerWallArray[1][2], lowerWallArray[1][3], lowerWallArray[1][4], lowerWallArray[1][5], lowerWallArray[i].room)]]--
     end
 	--add the doors
 	for i=1,doorCount do
