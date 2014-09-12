@@ -34,44 +34,56 @@ function handleYesEvent ( event )
 		file:write( constants.totalLost, "\n")
 		file:write( constants.gamesPlayed, "\n")
 		file:write( constants.timePlayed, "\n")
+		for i=1,constants.achCount do
+			file:write( "false", "\n") --!!temp, this resets achievements for testing
+		end
 	io.close( file )
 	--remove the reset things
-	tempRect:removeSelf()
-	tempText:removeSelf()
-	yesButton:removeSelf()
-	noButton:removeSelf()
-	--remove and re-add the stats screen itself
-	totalGamesText:removeSelf()
-	totalTimeText:removeSelf()
-	totalInfText:removeSelf()
-	totalLostText:removeSelf()
-	
-	calcTime()
-	
-	totalGamesText = display.newText( "Games played: "..constants.gamesPlayed, display.contentCenterX, display.contentCenterY-120, native.systemFont, 16 )
-	totalGamesText:setFillColor ( 0, 0, 0 )
-	
-	totalTimeText = display.newText( "Time played: "..tempDay.."d, "..tempHour.."h, "..tempMinute.."m, "..tempSecond.."s", display.contentCenterX, display.contentCenterY-90, native.systemFont, 16 )
-	totalTimeText:setFillColor ( 0, 0, 0 )
-	
-	totalInfText = display.newText( "Total infected: "..constants.totalInfections, display.contentCenterX, display.contentCenterY-60, native.systemFont, 16 )
-	totalInfText:setFillColor ( 0, 0, 0 )
-	
-	totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
-	totalLostText:setFillColor ( 0, 0, 0 )
-	
+	if ( "ended" == event.phase ) then
+		tempRect:removeSelf()
+		tempText:removeSelf()
+		yesButton:removeSelf()
+		noButton:removeSelf()
+		--remove and re-add the stats screen itself
+		totalGamesText:removeSelf()
+		totalTimeText:removeSelf()
+		totalInfText:removeSelf()
+		totalLostText:removeSelf()
+		
+		calcTime()
+		
+		totalGamesText = display.newText( "Games played: "..constants.gamesPlayed, display.contentCenterX, display.contentCenterY-120, native.systemFont, 16 )
+		totalGamesText:setFillColor ( 0, 0, 0 )
+		
+		totalTimeText = display.newText( "Time played: "..tempDay.."d, "..tempHour.."h, "..tempMinute.."m, "..tempSecond.."s", display.contentCenterX, display.contentCenterY-90, native.systemFont, 16 )
+		totalTimeText:setFillColor ( 0, 0, 0 )
+		
+		totalInfText = display.newText( "Total infected: "..constants.totalInfections, display.contentCenterX, display.contentCenterY-60, native.systemFont, 16 )
+		totalInfText:setFillColor ( 0, 0, 0 )
+		
+		totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
+		totalLostText:setFillColor ( 0, 0, 0 )
+	end
+	menuButton:setEnabled ( true )
+	resetButton:setEnabled ( true )
 	return true
 end
 
 function handleNoEvent ( event )
-	tempRect:removeSelf()
-	tempText:removeSelf()
-	yesButton:removeSelf()
-	noButton:removeSelf()
+	if ( "ended" == event.phase ) then
+		tempRect:removeSelf()
+		tempText:removeSelf()
+		yesButton:removeSelf()
+		noButton:removeSelf()
+	end
+	menuButton:setEnabled ( true )
+	resetButton:setEnabled ( true )
 	return true
 end
 
 function handleResetEvent ( event )
+	menuButton:setEnabled ( false )
+	
 local options = {
    text = "Warning! This will reset your stats!\nAre you sure you want to continue?",
    x = display.contentCenterX,
@@ -83,6 +95,7 @@ local options = {
 }
 
     if ( "ended" == event.phase ) then
+		resetButton:setEnabled ( false )
 		tempRect = display.newRect( display.contentCenterX, display.contentCenterY, 400, 200 )
 		tempRect:setFillColor( 1, 1, 1 )
 		tempRect.strokeWidth = 3

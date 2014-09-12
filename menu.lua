@@ -2,7 +2,7 @@ composer = require( "composer" )
 local constants = require( "constants" )
 local scene = composer.newScene()
 local widget = require( "widget" )
-local menuLoop, startButton, optionsButton, statsButton, title, menuLoopChannel
+local menuLoop, startButton, optionsButton, statsButton, title, menuLoopChannel, achButton
 
 display.setStatusBar( display.HiddenStatusBar )   
 --==============
@@ -18,8 +18,20 @@ local function handleStartEvent( event )
 	return true
 end
 
+local function handleAchEvent( event )
+    if ( "ended" == event.phase ) then
+        -- Assumes that "menu.lua" exists and is configured as a Composer scene
+		timer.performWithDelay( 1, goAch )
+    end
+	return true
+end
+
 function goStart()
 	composer.gotoScene( "chooselevel" )
+end
+
+function goAch()
+	composer.gotoScene( "achievements" )
 end
 
 local function handleOptionsEvent( event )
@@ -58,6 +70,9 @@ local function loadGame()
 		file2:write( constants.totalLost, "\n")
 		file2:write( constants.gamesPlayed, "\n")
 		file2:write( constants.timePlayed, "\n")
+		for i=1,constants.achCount do
+			file2:write( "false", "\n")
+		end
 		io.close( file2 )
 		print("New save created.")
 	end
@@ -121,6 +136,123 @@ local function loadGame()
 		end
 		if lineNumber == 18 then
 			constants.timePlayed = line
+		end
+		if lineNumber == 19 then
+			constants.achUnlocked[1] = line
+		end
+		if lineNumber == 20 then
+			constants.achUnlocked[2] = line
+		end
+		if lineNumber == 21 then
+			constants.achUnlocked[3] = line
+		end
+		if lineNumber == 22 then
+			constants.achUnlocked[4] = line
+		end
+		if lineNumber == 23 then
+			constants.achUnlocked[5] = line
+		end
+		if lineNumber == 24 then
+			constants.achUnlocked[6] = line
+		end
+		if lineNumber == 25 then
+			constants.achUnlocked[7] = line
+		end
+		if lineNumber == 26 then
+			constants.achUnlocked[8] = line
+		end
+		if lineNumber == 27 then
+			constants.achUnlocked[9] = line
+		end
+		if lineNumber == 28 then
+			constants.achUnlocked[10] = line
+		end
+		if lineNumber == 29 then
+			constants.achUnlocked[11] = line
+		end
+		if lineNumber == 30 then
+			constants.achUnlocked[12] = line
+		end
+		if lineNumber == 31 then
+			constants.achUnlocked[13] = line
+		end
+		if lineNumber == 32 then
+			constants.achUnlocked[14] = line
+		end
+		if lineNumber == 33 then
+			constants.achUnlocked[15] = line
+		end
+		if lineNumber == 34 then
+			constants.achUnlocked[16] = line
+		end
+		if lineNumber == 35 then
+			constants.achUnlocked[17] = line
+		end
+		if lineNumber == 36 then
+			constants.achUnlocked[18] = line
+		end
+		if lineNumber == 37 then
+			constants.achUnlocked[19] = line
+		end
+		if lineNumber == 38 then
+			constants.achUnlocked[20] = line
+		end
+		if lineNumber == 39 then
+			constants.achUnlocked[21] = line
+		end
+		if lineNumber == 40 then
+			constants.achUnlocked[22] = line
+		end
+		if lineNumber == 41 then
+			constants.achUnlocked[23] = line
+		end
+		if lineNumber == 42 then
+			constants.achUnlocked[24] = line
+		end
+		if lineNumber == 43 then
+			constants.achUnlocked[25] = line
+		end
+		if lineNumber == 44 then
+			constants.achUnlocked[26] = line
+		end
+		if lineNumber == 45 then
+			constants.achUnlocked[27] = line
+		end
+		if lineNumber == 46 then
+			constants.achUnlocked[28] = line
+		end
+		if lineNumber == 47 then
+			constants.achUnlocked[29] = line
+		end
+		if lineNumber == 48 then
+			constants.achUnlocked[30] = line
+		end
+		if lineNumber == 49 then
+			constants.achUnlocked[31] = line
+		end
+		if lineNumber == 50 then
+			constants.achUnlocked[32] = line
+		end
+		if lineNumber == 51 then
+			constants.achUnlocked[33] = line
+		end
+		if lineNumber == 52 then
+			constants.achUnlocked[34] = line
+		end
+		if lineNumber == 53 then
+			constants.achUnlocked[35] = line
+		end
+		if lineNumber == 54 then
+			constants.achUnlocked[36] = line
+		end
+		if lineNumber == 55 then
+			constants.achUnlocked[37] = line
+		end
+		if lineNumber == 56 then
+			constants.achUnlocked[38] = line
+		end
+		if lineNumber == 57 then
+			constants.achUnlocked[39] = line
 		end
 		lineNumber = lineNumber + 1
 	end
@@ -210,7 +342,20 @@ function scene:show( event )
 		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
 		strokeWidth = 2
 	}
-		
+	
+	achButton = widget.newButton
+	{
+		onEvent = handleAchEvent,
+		--properties for a rounded rectangle button...
+		width = 48,
+		height = 48,
+		defaultFile = "crown.png",
+		overFile = "crown.png",
+		font = native.systemFont,
+		cornerRadius = 0,
+		strokeWidth = 0
+	}
+	
 		-- Center the buttons
 		startButton.x = display.contentCenterX
 		startButton.y = display.contentCenterY-40
@@ -218,6 +363,8 @@ function scene:show( event )
 		optionsButton.y = display.contentCenterY+20
 		statsButton.x = display.contentCenterX
 		statsButton.y = display.contentCenterY+80
+		achButton.x = display.contentWidth-40
+		achButton.y = display.contentHeight-40
 		-- Change the buttons' label text
 		startButton:setLabel( "Start" )
 		optionsButton:setLabel( "Options" )
@@ -228,6 +375,7 @@ function scene:show( event )
 	sceneGroup:insert(startButton)
 	sceneGroup:insert(optionsButton)
 	sceneGroup:insert(title)
+	sceneGroup:insert(achButton)
 	constants.victory = 0
 	
 	--"did" fires when the scene is FULLY
@@ -236,7 +384,6 @@ function scene:show( event )
 		--start runtime listeners like "enterFrame"
 		--start timers, transitions, sprite animations.
 		print( "Game loaded." )
-			
 		-- Play the background music on channel 1, loop infinitely, and fade in over 5 seconds 
 		--menuLoopChannel = audio.play( menuLoop, { channel=1, loops=-1, fadein=100 } )
     end
@@ -254,12 +401,13 @@ function scene:hide( event )
 		optionsButton:removeSelf()
 		title:removeSelf()
 		statsButton:removeSelf()
+		achButton:removeSelf()
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)
 		--set each variable we are allocating to nil
 		--to ensure proper cleanup
-		startButton, optionsButton, title, menuLoop = nil
+		startButton, optionsButton, title, menuLoop, achButton, statsButton = nil
 		
     elseif ( phase == "did" ) then
 		--not much to do here, except force removal of

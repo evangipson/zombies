@@ -77,16 +77,28 @@ made walls into own arrays for pathing (leftWallArray etc)
 assigned walls to rooms (leftWallArray.room)
 rewrote wall logic - civilians now definitely can't pass through walls
 
+v0.14
+cleaned up civilian move logic
+added achievements menu
+added achievements to save file
+added achievments unlock popup
+fixed a few bugs where a button clicked would click underlying button too
+fixed bug that would crash stats screen
+added military
+added logic for zombies to target military
+
 -TO DO
 momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
 highscores
-improve AI and pathing more (civilians just standing by a wall - move to closest corner instead of random up/down movement)
-add military
+improve AI and pathing
 zombies can't walk through each other
 zombies can't walk through walls
 civs can't walk through each other
 doors have hp, civs pass through
+military die
+military kills zombies
+military moves
 
 -known bugs:
 * an old save file has a different format and might fuck shit up, need to put in a check for this somehow, count the lines in the file or whatnot

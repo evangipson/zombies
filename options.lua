@@ -94,6 +94,9 @@ function saveSettings()
 		file:write( constants.totalLost, "\n")
 		file:write( constants.gamesPlayed, "\n")
 		file:write( constants.timePlayed, "\n")
+		for i=1,constants.achCount do
+			file:write( constants.achUnlocked[i], "\n")
+		end
 	io.close( file )
 end
 

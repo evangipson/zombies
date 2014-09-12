@@ -3,10 +3,87 @@ local constants = require( "constants" )
 local scene = composer.newScene()
 local widget = require( "widget" )
 local endText, timeText
+local isUnlocked = 0
+local displayAchievement = false
 
 --==============
 --USER FUNCTIONS
 --==============
+function checkAchievements ( event )
+	if (constants.victory == 1 and constants.currentLevel == 1 and constants.levelCleared[2] == "false") then
+		constants.achUnlocked[1] = "true"
+		isUnlocked = 1
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 2 and constants.levelCleared[3] == "false") then
+		constants.achUnlocked[2] = "true"
+		isUnlocked = 2
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 3 and constants.levelCleared[4] == "false") then
+		constants.achUnlocked[3] = "true"
+		isUnlocked = 3
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 4 and constants.levelCleared[5] == "false") then
+		constants.achUnlocked[4] = "true"
+		isUnlocked = 4
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 5 and constants.levelCleared[6] == "false") then
+		constants.achUnlocked[5] = "true"
+		isUnlocked = 5
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 6 and constants.levelCleared[7] == "false") then
+		constants.achUnlocked[6] = "true"
+		isUnlocked = 6
+	end
+	if (constants.victory == 1 and constants.currentLevel == 7 and constants.levelCleared[8] == "false") then
+		constants.achUnlocked[7] = "true"
+		isUnlocked = 7
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 8 and constants.levelCleared[9] == "false") then
+		constants.achUnlocked[8] = "true"
+		isUnlocked = 8
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 9 and constants.levelCleared[10] == "false") then
+		constants.achUnlocked[9] = "true"
+		isUnlocked = 9
+		constants.level6achCleared = 0
+	end
+	if (constants.victory == 1 and constants.currentLevel == 10 and constants.levelCleared[11] == "false") then
+		constants.achUnlocked[10] = "true"
+		isUnlocked = 10
+		constants.level6achCleared = 0
+	end
+	--check secret level 6 achievement
+	if (constants.victory == 1 and constants.currentLevel == 6) then
+		constants.level6achCleared = constants.level6achCleared + 1
+		if constants.level6achCleared == 3 then
+			constants.achUnlocked[39] = "true"
+			isUnlocked = 39
+		end
+	end
+	if isUnlocked > 0 then
+		achPopUp( isUnlocked )
+	end
+end
+
+function achPopUp ( isUnlocked )
+	displayAchievement = true
+	achievementText = "Achievement unlocked!\n"..constants.achArray[isUnlocked]
+	timer.performWithDelay( 3000, achPopDown )
+end
+
+function achPopDown ( event )
+	displayAchievement = false
+	achRect:removeSelf()
+	tempAchText:removeSelf()
+end
+
 local function handleMenuEvent( event )
     if ( "ended" == event.phase ) then
         -- Assumes that "menu.lua" exists and is configured as a Composer scene
@@ -28,6 +105,9 @@ function saveSettings()
 		file:write( constants.totalLost, "\n")
 		file:write( constants.gamesPlayed, "\n")
 		file:write( constants.timePlayed, "\n")
+		for i=1,constants.achCount do
+			file:write( constants.achUnlocked[i], "\n")
+		end
 	io.close( file )
 end
 
@@ -48,7 +128,8 @@ function scene:show( event )
     local phase = event.phase
 	local tempText
     display.setDefault( "background", 1, 1, 1 )
-	
+	--first check achievements
+	checkAchievements()
 	--"will" fires when the scene has been called but it's not on screen yet.
     if ( phase == "will" ) then
 		--we position elements here, because we are re-entering the scene
@@ -99,6 +180,25 @@ function scene:show( event )
 		--center buttons
 		menuButton.x = display.contentCenterX
 		menuButton.y = display.contentCenterY+60
+	
+	if displayAchievement == true then
+		achRect = display.newRect(display.contentCenterX, display.contentHeight-25, 250, 40)
+		achRect.strokeWidth = 4
+		achRect:setFillColor(  1, 1, 1  )
+		achRect:setStrokeColor( 0.5, 0.5, 0.5 )
+		local options = {
+			text = achievementText,
+			x = display.contentCenterX,
+			y = display.contentHeight-20,
+			width = 240,
+			height = 35,
+			fontSize = 12,
+			align = "center"
+		}
+		tempAchText = display.newText( options )
+		tempAchText:setFillColor( 0, 0, 0 )
+	end
+	
 	--"did" fires when the scene is FULLY
 	--on the screen.
     elseif ( phase == "did" ) then
@@ -125,6 +225,11 @@ function scene:hide( event )
 		lostText:removeSelf()
 		constants.civsInfected = 0		
 		constants.zombiesLost = 0
+		if displayAchievement == true then
+			achRect:removeSelf()
+			tempAchText:removeSelf()
+			displayAchievement = false
+		end
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)
