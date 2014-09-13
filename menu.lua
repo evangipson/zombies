@@ -64,15 +64,17 @@ local function loadGame()
 		for i=1,11 do
 			file2:write( "false", "\n" )
 		end
-		file2:write( "Bottom Right", "\n")
-		file2:write( constants.timerOn, "\n")
-		file2:write( constants.totalInfections, "\n")
-		file2:write( constants.totalLost, "\n")
-		file2:write( constants.gamesPlayed, "\n")
-		file2:write( constants.timePlayed, "\n")
+		file2:write( "Bottom Right", "\n" )
+		file2:write( constants.timerOn, "\n" )
+		file2:write( constants.totalInfections, "\n" )
+		file2:write( constants.totalLost, "\n" )
+		file2:write( constants.gamesPlayed, "\n" )
+		file2:write( constants.timePlayed, "\n" )
 		for i=1,constants.achCount do
-			file2:write( "false", "\n")
+			file2:write( "false", "\n" )
 		end
+		file2:write( constants.totalMilInfections, "\n" )
+		file2:write( constants.rangeOn, "\n" )
 		io.close( file2 )
 		print("New save created.")
 	end
@@ -253,6 +255,12 @@ local function loadGame()
 		end
 		if lineNumber == 57 then
 			constants.achUnlocked[39] = line
+		end
+		if lineNumber == 58 then
+			constants.totalMilInfections = line
+		end
+		if lineNumber == 59 then
+			constants.rangeOn = line
 		end
 		lineNumber = lineNumber + 1
 	end

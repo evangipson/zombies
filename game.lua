@@ -24,11 +24,13 @@ local zombieArray = {}
 local zombieCircles = {}
 local militaryArray = {}
 local milCircles = {}
+local milRangeCircles = {}
 local zombieClicks
 local zombieCount = 0
 local mapSize={}
 local startTime, endTime
 local tempInfected = 0
+local tempMilInfected = 0
 local tempLost = 0
 local moveCounter = 0
 local moveCounterCiv = 0
@@ -57,6 +59,7 @@ local displayAchievement = false
 local achievementText
 local achTime = 0
 local achLost = constants.totalLost
+local achMilInfections = constants.totalMilInfections
 local civDist = nil
 local civTarget = 0
 local distX, distY
@@ -66,6 +69,7 @@ local milDist = nil
 local milTarget = 0
 local milDistX, milDistY
 local milDistArray = {}
+local bittenMil = 0
 local targetDirection = 0
 local movementX, movementY
 local infectBool
@@ -508,6 +512,19 @@ local isUnlocked = 0
 		constants.achUnlocked[24] = "true"
 		isUnlocked = 24
 	end
+	--check for military achievements
+	if (achMilInfections == 1 and constants.achUnlocked[25] == "false") then
+		constants.achUnlocked[25] = "true"
+		isUnlocked = 25
+	end
+	if (achMilInfections == 10	and constants.achUnlocked[26] == "false") then
+		constants.achUnlocked[25] = "true"
+		isUnlocked = 25
+	end
+	if (achMilInfections == 100 and constants.achUnlocked[27] == "false") then
+		constants.achUnlocked[25] = "true"
+		isUnlocked = 25
+	end
 	--check for time achievements
 	if (achTime > 900 and achTime < 1100) then
 		constants.achUnlocked[28] = "true"
@@ -597,6 +614,19 @@ function eatCivs( event )
 			end
 		end
 	end
+	for i=1,#militaryArray do
+		if i > #militaryArray then --error because we remove a zombie from the array in the middle of the thing
+			print("ERROR: militaryArray > i")
+			else
+			if militaryArray[i].status == "bitten" then
+				militaryArray[i].lifeLeft = militaryArray[i].lifeLeft - 5
+			end
+			if militaryArray[i].lifeLeft < 1 then --turn into zombie
+				bittenMil = i
+				infectMil()
+			end
+		end
+	end
 end
 
 function clickCiv( event )
@@ -631,6 +661,20 @@ function infectCiv ( event )
 		zombieCount = zombieCount + 1
 		tempInfected = tempInfected + 1
 		achInfections = achInfections + 1
+end
+
+function infectMil ( event )
+	--the zombie will be inserted in the next slot in the array, so the zombie count + 1.
+	--event.target.arrayNumber is given to the civilians when the map is drawn and is their unique identifier.
+	--add civilian to zombie array
+	print(bittenMil, "health less than 1, turning")
+		zombieArray[zombieCount+1] = {militaryArray[bittenMil][1],militaryArray[bittenMil][2]}
+		--remove it from civilian table
+		table.remove(militaryArray, bittenMil)
+	--increase zombiecount because there's a zombie now
+	zombieCount = zombieCount + 1
+	tempMilInfected = tempMilInfected + 1
+	achMilInfections = achMilInfections + 1
 end
 
 function killZombie ( event )
@@ -1289,7 +1333,7 @@ function moveTowardsCiv ( i )
 				if math.random(1, movementX+movementY) < movementY then
 					zombieArray[i][2] = zombieArray[i][2] - 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					zombieArray[i][1] = zombieArray[i][1] + 1
 				end
 			end
 		end
@@ -1379,7 +1423,7 @@ function moveTowardsMil ( i )
 				if math.random(1, movementX+movementY) < movementY then
 					zombieArray[i][2] = zombieArray[i][2] - 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					zombieArray[i][1] = zombieArray[i][1] + 1
 				end
 			end
 		end
@@ -1435,6 +1479,8 @@ function moveZombies( event )
 		--see which is closer
 		if civDist == nil then
 			targetCiv = false
+		elseif milDist == nil then
+			targetCiv = true
 		elseif civDist < milDist then
 			targetCiv = true
 		end
@@ -1601,22 +1647,25 @@ function renderOut()
 				end
 			end
 		end
+		if constants.rangeOn == "Indicator On" then
+			milRangeCircles[i] = display.newCircle(militaryArray[i][1], militaryArray[i][2],50)
+			milRangeCircles[i]:setFillColor( 0.5, 0.5, 0.5, 0.2 )
+			milRangeCircles[i].arrayNumber = i
+			table.insert(world,milRangeCircles[i])
+		end
 	end
 	--add the click counter
 	local tempx, tempy
 	if constants.counterLocation == "Bottom Right" then
 		tempx = display.contentWidth-20
 		tempy = display.contentHeight-20
-	end
-	if constants.counterLocation == "Bottom Left" then
+	elseif constants.counterLocation == "Bottom Left" then
 		tempx = 20
 		tempy = display.contentHeight-20
-	end
-	if constants.counterLocation == "Top Left" then
+	elseif constants.counterLocation == "Top Left" then
 		tempx = 20
 		tempy = 20
-	end
-	if constants.counterLocation == "Top Right" then
+	elseif constants.counterLocation == "Top Right" then
 		tempx = display.contentWidth-20
 		tempy = 20
 	end
@@ -1684,15 +1733,17 @@ end
 function endScene()
 	constants.levelTime = endTime - startTime
 	constants.civsInfected = tempInfected
+	constants.milInfected = tempMilInfected
 	constants.zombiesLost = tempLost
 	--update stuff on stats screen
 	constants.totalInfections = constants.totalInfections + tempInfected
 	constants.totalLost = constants.totalLost + tempLost
 	constants.gamesPlayed = constants.gamesPlayed + 1
 	constants.timePlayed = constants.timePlayed + constants.levelTime
+	constants.totalMilInfections = constants.milInfected + tempMilInfected
 	tempLost = 0
 	tempInfected = 0
-	
+	tempMilInfected = 0
 	composer.gotoScene( "afterscreen" )
 	return true
 end

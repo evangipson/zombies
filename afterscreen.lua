@@ -2,7 +2,7 @@ local composer = require( "composer" )
 local constants = require( "constants" )
 local scene = composer.newScene()
 local widget = require( "widget" )
-local endText, timeText
+local endText, timeText, milText
 local isUnlocked = 0
 local displayAchievement = false
 
@@ -99,15 +99,17 @@ function saveSettings()
 		for i=1,11 do
 			file:write( constants.levelCleared[i], "\n" )
 		end
-		file:write( constants.counterLocation, "\n")
-		file:write( constants.timerOn, "\n")
-		file:write( constants.totalInfections, "\n")
-		file:write( constants.totalLost, "\n")
-		file:write( constants.gamesPlayed, "\n")
-		file:write( constants.timePlayed, "\n")
+		file:write( constants.counterLocation, "\n" )
+		file:write( constants.timerOn, "\n" )
+		file:write( constants.totalInfections, "\n" )
+		file:write( constants.totalLost, "\n" )
+		file:write( constants.gamesPlayed, "\n" )
+		file:write( constants.timePlayed, "\n" )
 		for i=1,constants.achCount do
-			file:write( constants.achUnlocked[i], "\n")
+			file:write( constants.achUnlocked[i], "\n" )
 		end
+		file:write( constants.totalMilInfections, "\n" )
+		file:write( constants.rangeOn, "\n" )
 	io.close( file )
 end
 
@@ -153,8 +155,12 @@ function scene:show( event )
 	infText = display.newText("Civilians infected: "..constants.civsInfected, display.contentCenterX, 90, native.systemFont, 16 )
 	infText:setFillColor( 0, 0, 0 )
 	
+	--add military infected
+	milText = display.newText("Miltary infected: "..constants.milInfected, display.contentCenterX, 120, native.systemFont, 16 )
+	milText:setFillColor( 0, 0, 0 )
+	
 	--add zombies lost
-	lostText = display.newText("Zombies lost: "..constants.zombiesLost, display.contentCenterX, 120, native.systemFont, 16 )
+	lostText = display.newText("Zombies lost: "..constants.zombiesLost, display.contentCenterX, 150, native.systemFont, 16 )
 	lostText:setFillColor( 0, 0, 0 )
 	
 	--update stats
@@ -179,7 +185,7 @@ function scene:show( event )
 		
 		--center buttons
 		menuButton.x = display.contentCenterX
-		menuButton.y = display.contentCenterY+60
+		menuButton.y = display.contentCenterY+80
 	
 	if displayAchievement == true then
 		achRect = display.newRect(display.contentCenterX, display.contentHeight-25, 250, 40)
@@ -222,6 +228,7 @@ function scene:hide( event )
 		constants.currentLevel = 0
 		timeText:removeSelf()
 		infText:removeSelf()
+		milText:removeSelf()
 		lostText:removeSelf()
 		constants.civsInfected = 0		
 		constants.zombiesLost = 0
@@ -234,9 +241,7 @@ function scene:hide( event )
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)
 		--set each variable we are allocating to nil
-		--to ensure proper cleanup
-	
-		
+		--to ensure proper cleanup	
     elseif ( phase == "did" ) then
 		--not much to do here, except force removal of
 		--the scene after it transitions of screen for optimization.

@@ -12,6 +12,22 @@ sliderSize[1] = {400,10}
 --==============
 -- Function to handle button events
 
+local function handleRangeEvent( event )
+
+    if ( "ended" == event.phase ) then
+		if constants.rangeOn == "Indicator On" then
+			constants.rangeOn = "Indicator Off"
+			saveSettings()
+			rangeButton:setLabel( constants.rangeOn )
+		else
+			constants.rangeOn = "Indicator On"
+			saveSettings()
+			rangeButton:setLabel( constants.rangeOn )
+		end
+    end
+	return true
+end
+
 local function handleCounterEvent( event )
 
     if ( "ended" == event.phase ) then
@@ -88,15 +104,17 @@ function saveSettings()
 		for i=1,11 do
 			file:write( constants.levelCleared[i], "\n" )
 		end
-		file:write( constants.counterLocation, "\n")
-		file:write( constants.timerOn, "\n")
-		file:write( constants.totalInfections, "\n")
-		file:write( constants.totalLost, "\n")
-		file:write( constants.gamesPlayed, "\n")
-		file:write( constants.timePlayed, "\n")
+		file:write( constants.counterLocation, "\n" )
+		file:write( constants.timerOn, "\n" )
+		file:write( constants.totalInfections, "\n" )
+		file:write( constants.totalLost, "\n" )
+		file:write( constants.gamesPlayed, "\n" )
+		file:write( constants.timePlayed, "\n" )
 		for i=1,constants.achCount do
-			file:write( constants.achUnlocked[i], "\n")
+			file:write( constants.achUnlocked[i], "\n" )
 		end
+		file:write( constants.totalMilInfections, "\n" )
+		file:write( constants.rangeOn, "\n" )
 	io.close( file )
 end
 
@@ -164,8 +182,10 @@ function scene:show( event )
 	--and the speed thing
 	speedText = display.newText ("Scroll speed: "..tempSpeed, display.contentCenterX, display.contentCenterY-40, native.systemFont, 16 )
 	speedText:setFillColor( 0, 0, 0 )
-	counterText = display.newText ("Infection counter location:", display.contentCenterX, display.contentCenterY-125, native.systemFont, 16 )
+	counterText = display.newText ("Infection counter location:", display.contentCenterX-150, display.contentCenterY-125, native.systemFont, 16 )
 	counterText:setFillColor( 0, 0, 0 )
+	rangeText = display.newText ("Military range indicator:", display.contentCenterX+150, display.contentCenterY-125, native.systemFont, 16 )
+	rangeText:setFillColor( 0, 0, 0 )
 	
 	timerButton = widget.newButton
 	{
@@ -200,14 +220,34 @@ function scene:show( event )
 		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
 		strokeWidth = 2	
 	}
+	
+	rangeButton = widget.newButton
+	{
+		label = constants.rangeOn,
+		onEvent = handleRangeEvent,
+		emboss = false,
+		--properties for a rounded rectangle button...
+		shape="roundedRect",
+		width = 200,
+		height = 40,
+		font = native.systemFont,
+		cornerRadius = 10,
+		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+		strokeWidth = 2	
+	}
+
 
 		-- Center the buttons
 		backButton.x = display.contentCenterX
 		backButton.y = display.contentCenterY+100
 		timerButton.x = display.contentCenterX
 		timerButton.y = display.contentCenterY+30
-		counterButton.x = display.contentCenterX
+		counterButton.x = display.contentCenterX-150
 		counterButton.y = display.contentCenterY-90
+		rangeButton.x = display.contentCenterX+150
+		rangeButton.y = display.contentCenterY-90
 		-- Change the buttons' label text
 		backButton:setLabel( "Back" )
 		timerButton:setLabel( constants.timerOn )
@@ -238,6 +278,8 @@ function scene:hide( event )
 		timerButton:removeSelf()
 		counterButton:removeSelf()
 		counterText:removeSelf()
+		rangeButton:removeSelf()
+		rangeText:removeSelf()
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)

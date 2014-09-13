@@ -22,6 +22,7 @@ function handleYesEvent ( event )
 	constants.totalInfections = 0
 	constants.totalLost = 0
 	constants.gamesPlayed = 0
+	constants.totalMilInfections = 0
 	--save to file
 	local file = io.open( constants.saveFile, "w")
 		file:write( constants.scrollSpeed, "\n" )
@@ -49,6 +50,7 @@ function handleYesEvent ( event )
 		totalTimeText:removeSelf()
 		totalInfText:removeSelf()
 		totalLostText:removeSelf()
+		totalMilText:removeSelf()
 		
 		calcTime()
 		
@@ -61,8 +63,12 @@ function handleYesEvent ( event )
 		totalInfText = display.newText( "Total infected: "..constants.totalInfections, display.contentCenterX, display.contentCenterY-60, native.systemFont, 16 )
 		totalInfText:setFillColor ( 0, 0, 0 )
 		
-		totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
+		totalMilText = display.newText( "Total military infected: "..constants.totalMilInfections, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
+		totalMilText:setFillColor ( 0, 0, 0 )
+		
+		totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY, native.systemFont, 16 )
 		totalLostText:setFillColor ( 0, 0, 0 )
+		
 	end
 	menuButton:setEnabled ( true )
 	resetButton:setEnabled ( true )
@@ -220,7 +226,10 @@ function scene:show( event )
 		totalInfText = display.newText( "Total infected: "..constants.totalInfections, display.contentCenterX, display.contentCenterY-60, native.systemFont, 16 )
 		totalInfText:setFillColor ( 0, 0, 0 )
 		
-		totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
+		totalMilText = display.newText( "Total military infected: "..constants.totalMilInfections, display.contentCenterX, display.contentCenterY-30, native.systemFont, 16 )
+		totalMilText:setFillColor ( 0, 0, 0 )
+		
+		totalLostText = display.newText( "Total zombies lost: "..constants.totalLost, display.contentCenterX, display.contentCenterY, native.systemFont, 16 )
 		totalLostText:setFillColor ( 0, 0, 0 )
 		
 		--add the return to menu button
@@ -258,9 +267,9 @@ function scene:show( event )
 	}
 	
 		resetButton.x = display.contentCenterX
-		resetButton.y = display.contentCenterY+20
+		resetButton.y = display.contentCenterY+60
 		menuButton.x = display.contentCenterX
-		menuButton.y = display.contentCenterY+80
+		menuButton.y = display.contentCenterY+120
 	--"did" fires when the scene is FULLY
 	--on the screen.
     elseif ( phase == "did" ) then
@@ -284,26 +293,23 @@ function scene:hide( event )
 		totalLostText:removeSelf()
 		totalGamesText:removeSelf()
 		totalTimeText:removeSelf()
+		totalMilText:removeSelf()
 		resetButton:removeSelf()
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)
 		--set each variable we are allocating to nil
 		--to ensure proper cleanup
-	
-		
     elseif ( phase == "did" ) then
 		--not much to do here, except force removal of
 		--the scene after it transitions of screen for optimization.
     end
-    
 end
 
 function scene:destroy( event )
 	--dispose of all allocated variables and audio
 	--in the create function here
     local sceneGroup = self.view
-    
 end
 
 scene:addEventListener( "create", scene )

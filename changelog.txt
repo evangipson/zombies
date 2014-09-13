@@ -87,6 +87,15 @@ fixed bug that would crash stats screen
 added military
 added logic for zombies to target military
 
+v0.15
+military can now be infected
+military infected added to end of level stats
+fixed bug where zombies move to the left when target is top right
+added total military infected to stats screen
+added achievements for infecting military
+added military range indicator
+added option to turn indicator on/off
+
 -TO DO
 momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
@@ -96,9 +105,10 @@ zombies can't walk through each other
 zombies can't walk through walls
 civs can't walk through each other
 doors have hp, civs pass through
-military die
 military kills zombies
 military moves
+
+
 
 -known bugs:
 * an old save file has a different format and might fuck shit up, need to put in a check for this somehow, count the lines in the file or whatnot

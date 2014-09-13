@@ -3,6 +3,7 @@ local rtn={}
 rtn.scrollSpeed = nil
 rtn.counterLocation = "Bottom Right"
 rtn.timerOn = "Timer Shown"
+rtn.rangeOn = "Indicator On"
 
 --level progress constants
 rtn.levelCleared = {}
@@ -12,6 +13,7 @@ rtn.infUnlocked = 0
 rtn.victory = 0
 rtn.levelTime = 0
 rtn.civsInfected = 0
+rtn.milInfected = 0
 rtn.zombiesLost = 0
 rtn.zombieHealth = 50
 rtn.civHealth = 50
@@ -23,6 +25,7 @@ rtn.totalInfections = 0
 rtn.totalLost = 0
 rtn.gamesPlayed = 0
 rtn.timePlayed = 0
+rtn.totalMilInfections = 0
 
 --save game location
 rtn.saveFile = system.pathForFile( "infectzensave.txt", system.DocumentsDirectory)
@@ -58,8 +61,8 @@ rtn.level1DoorX={75}
 rtn.level1DoorY={50}
 rtn.level1DoorType={"H"}
 rtn.level1DoorRoom={1}
-rtn.level1CivX={120, 140}
-rtn.level1CivY={60, 80}
+rtn.level1CivX={120, 120}
+rtn.level1CivY={60, 100}
 rtn.level1MilX={100}
 rtn.level1MilY={100}
 rtn.level1Zombies = 1
