@@ -96,19 +96,37 @@ added achievements for infecting military
 added military range indicator
 added option to turn indicator on/off
 
+v0.16
+added zombie health
+added continue/retry button on afterscreen
+military now shoot zombies within range
+fixed bug where some achievements didn't register
+fixed bug where achievements would cause next level to crash
+added lines to show where military shoot
+various small bugfixes, may or may not have been related to new features in v0.16
+killing the attacking zombie will stop military from turning
+zombies no longer walk through walls
+military now only target zombies in the same room (broke it i think)
+reworked civilian AI logic:
+- added .targetX and targetY to zed arrays
+- add .targetDirection to civ/mil/zed arrays
+- add .target to civ/mil/zed arrays
+now civs actually walk through doors properly(ish)
+
 -TO DO
 momentum when scrolling (scrollview doesn't seem to work)
 pinch and zoom
 highscores
-improve AI and pathing
+improve AI and pathing (.targetType and .target)
 zombies can't walk through each other
 zombies can't walk through walls
 civs can't walk through each other
 doors have hp, civs pass through
-military kills zombies
-military moves
+military doesn't shoot through walls
+replace slider with slider widget
+only change target every 5 ticks (or when reaching targetX/targetY) to combat indecisiveness
 
-
+civilians target rooms
 
 -known bugs:
 * an old save file has a different format and might fuck shit up, need to put in a check for this somehow, count the lines in the file or whatnot
@@ -117,3 +135,5 @@ military moves
 * civilians run to corners and refuse to run sideways when they hit a wall. oh well, if they want to die that bad...
 * scrolling lets people walk through walls
 * civilians get stuck on corners when trying to get to a door
+* the freaking achievements for finishing levels is weird as fuck
+* zombies stop moving after infecting

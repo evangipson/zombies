@@ -24,6 +24,7 @@ local zombieArray = {}
 local zombieCircles = {}
 local militaryArray = {}
 local milCircles = {}
+local milLines = {}
 local milRangeCircles = {}
 local zombieClicks
 local zombieCount = 0
@@ -36,43 +37,30 @@ local moveCounter = 0
 local moveCounterCiv = 0
 local bittenCiv
 local infCounter = 0
+local milCounter = 0
 local randomSpawn = 30
-local zombieDist = nil
-local zombieTarget = 0
-local zombieDirection = 0
+local randomMilSpawn = 120
 local distX, distY
 local distanceArray = {}
-local doorDist = nil
-local doorTarget = 0
-local doorDirection = 0
-local doorDistArray = {}
-local doorDistX, doorDistY
-local movementX, movementY
-local doorMovementX, doorMovementY
 local infectBool
 local newPosX, newPosY
-local hitDoor = false
-local targetDoor = false
 local civDirection
-local achInfections = constants.totalInfections
+local achInfections = 0
 local displayAchievement = false
 local achievementText
 local achTime = 0
-local achLost = constants.totalLost
-local achMilInfections = constants.totalMilInfections
-local civDist = nil
-local civTarget = 0
+local achLost = 0
+local achMilInfections = 0
 local distX, distY
-local targetCiv = false
 local distanceArray = {}
-local milDist = nil
-local milTarget = 0
-local milDistX, milDistY
-local milDistArray = {}
 local bittenMil = 0
 local targetDirection = 0
 local movementX, movementY
 local infectBool
+local fireCounter = {}
+local zedTarget = 0
+local gameAchTimer
+local doorDist
 
 function detectLevel(init)
 	--check which level player is on and set room variables accordingly
@@ -105,6 +93,7 @@ function detectLevel(init)
 		milCount = #constants.level0MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level0MilX[i], constants.level0MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level0Zombies
@@ -136,6 +125,7 @@ function detectLevel(init)
 		milCount = #constants.level1MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level1MilX[i], constants.level1MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level1Zombies
@@ -167,6 +157,7 @@ function detectLevel(init)
 		milCount = #constants.level2MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level2MilX[i], constants.level2MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level2Zombies	
@@ -198,6 +189,7 @@ function detectLevel(init)
 		milCount = #constants.level3MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level3MilX[i], constants.level3MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level3Zombies	
@@ -229,6 +221,7 @@ function detectLevel(init)
 		milCount = #constants.level4MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level4MilX[i], constants.level4MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level4Zombies	
@@ -260,6 +253,7 @@ function detectLevel(init)
 		milCount = #constants.level5MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level5MilX[i], constants.level5MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level5Zombies
@@ -291,6 +285,7 @@ function detectLevel(init)
 		milCount = #constants.level6MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level6MilX[i], constants.level6MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level6Zombies
@@ -322,6 +317,7 @@ function detectLevel(init)
 		milCount = #constants.level7MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level7MilX[i], constants.level7MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level7Zombies
@@ -353,6 +349,7 @@ function detectLevel(init)
 		milCount = #constants.level8MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level8MilX[i], constants.level8MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level8Zombies
@@ -384,6 +381,7 @@ function detectLevel(init)
 		milCount = #constants.level9MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level9MilX[i], constants.level9MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level9Zombies
@@ -415,6 +413,7 @@ function detectLevel(init)
 		milCount = #constants.level10MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level10MilX[i], constants.level10MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level10Zombies
@@ -447,6 +446,7 @@ function detectLevel(init)
 		milCount = #constants.level11MilX
 		for i=1,milCount do
 			militaryArray[i] = {constants.level11MilX[i], constants.level11MilY[i]}
+			milLines[i] = { militaryArray[i][1], militaryArray[i][2], militaryArray[i][1], militaryArray[i][2] }
 		end
 		--add the amount of click things
 		zombieClicks = constants.level11Zombies
@@ -456,74 +456,74 @@ end
 function checkAchievements ( event )
 local isUnlocked = 0
 	--check first for infections
-	if (achInfections == 1 and constants.achUnlocked[11] == "false") then
+	if (achInfections > 0 and achInfections < 5 and constants.achUnlocked[11] == "false") then
 		constants.achUnlocked[11] = "true"
 		isUnlocked = 11
 	end
-	if (achInfections == 10 and constants.achUnlocked[12] == "false") then
+	if (achInfections > 9 and achInfections < 16 and constants.achUnlocked[12] == "false") then
 		constants.achUnlocked[12] = "true"
 		isUnlocked = 12
 	end
-	if (achInfections == 42 and constants.achUnlocked[13] == "false") then
+	if (achInfections > 41 and achInfections < 50 and constants.achUnlocked[13] == "false") then
 		constants.achUnlocked[13] = "true"
 		isUnlocked = 13
 	end
-	if (achInfections == 100 and constants.achUnlocked[14] == "false") then
+	if (achInfections > 99 and achInfections < 120 and constants.achUnlocked[14] == "false") then
 		constants.achUnlocked[14] = "true"
 		isUnlocked = 14
 	end
-	if (achInfections == 1000 and constants.achUnlocked[15] == "false") then
+	if (achInfections > 1000 and achInfections < 1100 and constants.achUnlocked[15] == "false") then
 		constants.achUnlocked[15] = "true"
 		isUnlocked = 15
 	end
-	if (achInfections == 1337 and constants.achUnlocked[16] == "false") then
+	if (achInfections > 1336 and achInfections < 1400 and constants.achUnlocked[16] == "false") then
 		constants.achUnlocked[16] = "true"
 		isUnlocked = 16
 	end
-	if (achInfections == 10000 and constants.achUnlocked[17] == "false") then
+	if (achInfections > 9999 and achInfections < 10100 and constants.achUnlocked[17] == "false") then
 		constants.achUnlocked[17] = "true"
 		isUnlocked = 17
 	end
-	if (achInfections == 20000 and constants.achUnlocked[18] == "false") then
+	if (achInfections > 19999 and achInfections < 20100 and constants.achUnlocked[18] == "false") then
 		constants.achUnlocked[18] = "true"
 		isUnlocked = 18
 	end
-	if (achInfections == 100000 and constants.achUnlocked[19] == "false") then
+	if (achInfections > 99999 and achInfections < 100100 and constants.achUnlocked[19] == "false") then
 		constants.achUnlocked[19] = "true"
 		isUnlocked = 19
 	end
-	if (achInfections == 1000000 and constants.achUnlocked[20] == "false") then
+	if (achInfections > 999999 and achInfections < 1000100 and constants.achUnlocked[20] == "false") then
 		constants.achUnlocked[20] = "true"
 		isUnlocked = 20
 	end
-	if (achInfections == 10000000 and constants.achUnlocked[21] == "false") then
+	if (achInfections > 9999999 and achInfections < 10000100 and constants.achUnlocked[21] == "false") then
 		constants.achUnlocked[21] = "true"
 		isUnlocked = 21
 	end
-	if (achInfections == 100000000 and constants.achUnlocked[22] == "false") then
+	if (achInfections > 99999999 and achInfections < 100000100 and constants.achUnlocked[22] == "false") then
 		constants.achUnlocked[22] = "true"
 		isUnlocked = 22
 	end
-	if (achInfections == 1000000000 and constants.achUnlocked[23] == "false") then
+	if (achInfections > 999999999 and achInfections < 1000000100 and constants.achUnlocked[23] == "false") then
 		constants.achUnlocked[23] = "true"
 		isUnlocked = 23
 	end
-	if (achInfections == 7260027620 and constants.achUnlocked[24] == "false") then
+	if (achInfections > 7260027619 and achInfections < 7260027720 and constants.achUnlocked[24] == "false") then
 		constants.achUnlocked[24] = "true"
 		isUnlocked = 24
 	end
 	--check for military achievements
-	if (achMilInfections == 1 and constants.achUnlocked[25] == "false") then
+	if (achMilInfections > 0 and achMilInfections < 5 and constants.achUnlocked[25] == "false") then
 		constants.achUnlocked[25] = "true"
 		isUnlocked = 25
 	end
-	if (achMilInfections == 10	and constants.achUnlocked[26] == "false") then
-		constants.achUnlocked[25] = "true"
-		isUnlocked = 25
+	if (achMilInfections > 9 and achMilInfections < 15 and constants.achUnlocked[26] == "false") then
+		constants.achUnlocked[26] = "true"
+		isUnlocked = 26
 	end
-	if (achMilInfections == 100 and constants.achUnlocked[27] == "false") then
-		constants.achUnlocked[25] = "true"
-		isUnlocked = 25
+	if (achMilInfections > 99 and achMilInfections < 120 and constants.achUnlocked[27] == "false") then
+		constants.achUnlocked[27] = "true"
+		isUnlocked = 27
 	end
 	--check for time achievements
 	if (achTime > 900 and achTime < 1100) then
@@ -554,23 +554,23 @@ local isUnlocked = 0
 		achPopUp( isUnlocked )
 	end
 	--check loss achievements
-	if (achLost == 1 and constants.achUnlocked[34] == "false") then
+	if (achLost > 0 and achLost < 5 and constants.achUnlocked[34] == "false") then
 		constants.achUnlocked[34] = "true"
 		isUnlocked = 34
 	end
-	if (achLost == 10 and constants.achUnlocked[35] == "false") then
+	if (achLost > 9 and achLost < 15 and constants.achUnlocked[35] == "false") then
 		constants.achUnlocked[35] = "true"
 		isUnlocked = 35
 	end
-	if (achLost == 100 and constants.achUnlocked[36] == "false") then
+	if (achLost > 99 and achLost < 120 and constants.achUnlocked[36] == "false") then
 		constants.achUnlocked[36] = "true"
 		isUnlocked = 36
 	end
-	if (achLost == 1000 and constants.achUnlocked[37] == "false") then
+	if (achLost > 999 and achLost < 1100 and constants.achUnlocked[37] == "false") then
 		constants.achUnlocked[37] = "true"
 		isUnlocked = 37
 	end
-	if (achLost == 10000 and constants.achUnlocked[38] == "false") then
+	if (achLost > 9999 and achLost < 10100 and constants.achUnlocked[38] == "false") then
 		constants.achUnlocked[38] = "true"
 		isUnlocked = 38
 	end
@@ -580,16 +580,11 @@ end
 function achPopUp ( isUnlocked )
 	displayAchievement = true
 	achievementText = "Achievement unlocked!\n"..constants.achArray[isUnlocked]
-	timer.performWithDelay( 3000, achPopDown )
+	gameAchTimer = timer.performWithDelay( 3000, achPopDown )
 end
 
 function achPopDown ( event )
 	if displayAchievement == true then
-		print("taking it down automatically")
-		--[[achRect:removeSelf()
-		tempAchText:removeSelf()
-		achRect = nil
-		tempAchText = nil]]--
 		displayAchievement = false
 	end
 end
@@ -598,6 +593,20 @@ function spawnRandom ( event )
 	civilianArray[#civilianArray+1] = { math.random(50, 400), math.random(50, 300) }
 	civilianArray[#civilianArray].lifeLeft = constants.civHealth
 	civilianArray[#civilianArray].status = "healthy"
+	civilianArray[#civilianArray].targetType = "none"
+	civilianArray[#civilianArray].target = 0
+	civilianArray[#civilianArray].targetDist = 9999
+end
+
+function spawnRandomMil ( event )
+	militaryArray[#militaryArray+1] = { math.random(50, 400), math.random(50, 300) }
+	militaryArray[#militaryArray].lifeLeft = constants.milHealth
+	militaryArray[#militaryArray].status = "healthy"
+	militaryArray[#militaryArray].fireCounter = 0
+	militaryArray[#militaryArray].targetDist = 9999
+	militaryArray[#militaryArray].target = 0
+	milLines[#militaryArray] = { militaryArray[#militaryArray][1], militaryArray[#militaryArray][2], militaryArray[#militaryArray][1], militaryArray[#militaryArray][2] }
+	milLines[#militaryArray].fire = 0
 end
 
 function eatCivs( event )
@@ -640,6 +649,19 @@ function clickCiv( event )
 		table.remove(civilianArray, event.target.arrayNumber)
 		--increase zombiecount because there's a zombie now
 		zombieCount = zombieCount + 1
+		zombieArray[zombieCount].lifeLeft = constants.zombieHealth
+		zombieArray[zombieCount].targetType = "none"
+		zombieArray[zombieCount].target = 0
+		zombieArray[zombieCount].targetDist = 9999
+		zombieArray[zombieCount].targetX = 0
+		zombieArray[zombieCount].targetY = 0
+		for j=1,#roomArray do
+			if (zombieArray[zombieCount][1] > roomArray[j][1] and zombieArray[zombieCount][1] < roomArray[j][1]+roomArray[j][4]) then --zed is within x of room
+				if (zombieArray[zombieCount][2] > roomArray[j][2] and zombieArray[zombieCount][1] < roomArray[j][2]+roomArray[j][4]) then --zed is within y of room
+					zombieArray[zombieCount].currentRoom = j
+				end
+			end
+		end
 		zombieClicks = zombieClicks - 1
 		tempInfected = tempInfected + 1
 		achInfections = achInfections + 1
@@ -653,12 +675,25 @@ function infectCiv ( event )
 		--the zombie will be inserted in the next slot in the array, so the zombie count + 1.
 		--event.target.arrayNumber is given to the civilians when the map is drawn and is their unique identifier.
 		--add civilian to zombie array
-		print(bittenCiv, "health less than 1, turning")
 			zombieArray[zombieCount+1] = {civilianArray[bittenCiv][1],civilianArray[bittenCiv][2]}
 			--remove it from civilian table
 			table.remove(civilianArray, bittenCiv)
 		--increase zombiecount because there's a zombie now
 		zombieCount = zombieCount + 1
+		zombieArray[zombieCount].lifeLeft = constants.zombieHealth
+		zombieArray[zombieCount].targetType = "none"
+		zombieArray[zombieCount].target = 0
+		zombieArray[zombieCount].targetDist = 9999
+		--now remove this civ from the zombie that ate it
+		for i=1,#zombieArray do
+			if zombieArray[i].target == bittenCiv then
+				zombieArray[i].target = 0
+				zombieArray[i].targetDist = 9999
+				zombieArray[i].targetType = "none"
+				zombieArray[i].targetX = 0
+				zombieArray[i].targetY = 0
+			end
+		end
 		tempInfected = tempInfected + 1
 		achInfections = achInfections + 1
 end
@@ -667,22 +702,62 @@ function infectMil ( event )
 	--the zombie will be inserted in the next slot in the array, so the zombie count + 1.
 	--event.target.arrayNumber is given to the civilians when the map is drawn and is their unique identifier.
 	--add civilian to zombie array
-	print(bittenMil, "health less than 1, turning")
 		zombieArray[zombieCount+1] = {militaryArray[bittenMil][1],militaryArray[bittenMil][2]}
 		--remove it from civilian table
 		table.remove(militaryArray, bittenMil)
 	--increase zombiecount because there's a zombie now
 	zombieCount = zombieCount + 1
+	zombieArray[zombieCount].lifeLeft = constants.zombieHealth
+	zombieArray[zombieCount].targetType = "none"
+	zombieArray[zombieCount].target = 0
+	zombieArray[zombieCount].targetDist = 9999
+	for i=1,#zombieArray do
+		if zombieArray[i].target == bittenMil then
+			zombieArray[i].target = 0
+			zombieArray[i].targetDist = 9999
+			zombieArray[i].targetType = "none"
+			zombieArray[i].targetX = 0
+			zombieArray[i].targetY = 0
+		end
+	end
 	tempMilInfected = tempMilInfected + 1
 	achMilInfections = achMilInfections + 1
 end
 
-function killZombie ( event )
+function clickZombie ( event )
 	table.remove(zombieArray, event.target.arrayNumber)
 	zombieCount = zombieCount - 1
 	tempLost = tempLost + 1
 	achLost = achLost + 1
+	for p=1,#militaryArray do
+		if militaryArray[p].bittenBy == zedTarget then
+			militaryArray[p].bittenBy = nil
+			militaryArray[p].status = "healthy"
+		end
+		if militaryArray[p].target == zedTarget then
+			militaryArray[p].target = 0
+			militaryArray[p].targetDist = 9999
+		end
+	end
 	return true
+end
+
+function killZombie ( zedTarget )
+	table.remove(zombieArray, zedTarget)
+	zombieCount = zombieCount - 1
+	tempLost = tempLost + 1
+	achLost = achLost + 1
+	for p=1,#militaryArray do
+		if militaryArray[p].bittenBy == zedTarget then
+			militaryArray[p].bittenBy = nil
+			militaryArray[p].status = "healthy"
+		end
+		if militaryArray[p].target == zedTarget then
+			militaryArray[p].target = 0
+			militaryArray[p].targetDist = 9999
+		end
+	end
+	zedTarget = 0
 end
 
 function createRoom(init)
@@ -746,9 +821,6 @@ function moveWorld(event)
 end
 
 function findClosestZombie ( i, j )
-	if zombieDist == nil then
-		zombieDist = 999999
-	end
 	--compare distances to all zombie actors
 	distX = civilianArray[i][1]-zombieArray[j][1]
 	--no negative numbers please	
@@ -762,84 +834,76 @@ function findClosestZombie ( i, j )
 	end
 	distanceArray[j] = distX + distY
 	--now we have the distance, see if it's the closest
-	if distanceArray[j] < zombieDist then
-		zombieDist = distanceArray[j]
-		zombieTarget = j
-		movementX = distX
-		movementY = distY
+	if distanceArray[j] < civilianArray[i].targetDist then
+		civilianArray[i].targetType = "zombie"
+		civilianArray[i].target = j
+		civilianArray[i].targetDist = distanceArray[j]
+		civilianArray[i].targetX = zombieArray[j][1]
+		civilianArray[i].targetY = zombieArray[j][2]
 	end
-	distX = 0
-	distY = 0
 end
 
 function findClosestDoor ( i, m )
-	if doorDist == nil then
-		doorDist = 999999
-	end
 	--compare distances to all zombie actors
-	doorDistX = civilianArray[i][1]-doorArray[m].x
+	DistX = civilianArray[i][1]-doorArray[m].x
 	--no negative numbers please	
-	if doorDistX < 0 then
-		doorDistX = doorDistX*-1
+	if DistX < 0 then
+		DistX = DistX*-1
 	end
-	doorDistY = civilianArray[i][2]-doorArray[m].y
+	DistY = civilianArray[i][2]-doorArray[m].y
 	--no negative numbers please
-	if doorDistY < 0 then
-		doorDistY = doorDistY*-1
+	if DistY < 0 then
+		DistY = DistY*-1
 	end
-	doorDistArray[m] = doorDistX + doorDistY
+	distanceArray[m] = DistX + DistY
 	--now we have the distance, see if it's the closest
-	if doorDistArray[m] < doorDist then
-		doorDist = doorDistArray[m]
-		doorTarget = m
-		if (doorDist < 50 and doorDist > 2) then
-			doorMovementX = doorDistX
-			doorMovementY = doorDistY
-			targetDoor = true
-		end
+	if distanceArray[m] < civilianArray[i].targetDist then
+		civilianArray[i].targetDist = distanceArray[m]
+		civilianArray[i].targetType = "door"
+		civilianArray[i].target = m
+		civilianArray[i].targetX = doorArray[m].x
+		civilianArray[i].targetY = doorArray[m].y
 	end
-	--if the door is less than 3 units away, target the room instead
-	if doorDist < 3 then
-		doorMovementX = civilianArray[i][1] - roomArray[doorArray[doorTarget].room][1]
-		if doorMovementX < 0 then
-			doorMovementX = doorMovementX*-1
-		end
-		doorMovementY = civilianArray[i][2] - roomArray[doorArray[doorTarget].room][2]
-		if doorMovementY < 0 then
-			doorMovementY = doorMovementX*-1
-		end
+	if distanceArray[m] < doorDist then
+		doorDist = distanceArray[m]
 	end
-	doorDistX = 0
-	doorDistY = 0
 end
 
 function moveTowardsDoor ( i )
 	newPosX = civilianArray[i][1]
 	newPosY = civilianArray[i][2]
-	if civilianArray[i][1] < doorArray[doorTarget].x then
-		doorDirection = doorDirection + 2
-	elseif civilianArray[i][1] > doorArray[doorTarget].x then
-		doorDirection = doorDirection + 1
+	movementX = civilianArray[i][1]-civilianArray[i].targetX
+	movementY = civilianArray[i][2]-civilianArray[i].targetY
+	if movementX < 0 then
+		movementX = movementX*-1
+	end
+	if movementY < 0 then
+		movementY = movementY*-1
+	end
+	if civilianArray[i][1] < doorArray[civilianArray[i].target].x then
+		targetDirection = targetDirection + 2
+	elseif civilianArray[i][1] > doorArray[civilianArray[i].target].x then
+		targetDirection = targetDirection + 1
 	end
 	--see if it's up or down
-	if civilianArray[i][2] < doorArray[doorTarget].y then
-		doorDirection = doorDirection + 8
-	elseif civilianArray[i][2] > doorArray[doorTarget].y then
-		doorDirection = doorDirection + 4
+	if civilianArray[i][2] < doorArray[civilianArray[i].target].y then
+		targetDirection = targetDirection + 8
+	elseif civilianArray[i][2] > doorArray[civilianArray[i].target].y then
+		targetDirection = targetDirection + 4
 	end	
 	--now we have the direction! now we move towards the door
-	if doorDirection == 1 then --door is to the left, move left
+	if targetDirection == 1 then --door is to the right, move right
 		newPosX = civilianArray[i][1] - 1
-	elseif doorDirection == 2 then --door is to the right, move right
+	elseif targetDirection == 2 then --door is to the left, move lefts
 		newPosX = civilianArray[i][1] + 1
-	elseif doorDirection == 4 then --guess idiot
+	elseif targetDirection == 4 then --guess idiot
 		newPosY = civilianArray[i][2] - 1
-	elseif doorDirection == 8 then --you're stupid
+	elseif targetDirection == 8 then --you're stupid
 		newPosY = civilianArray[i][2] + 1
-	elseif doorDirection == 5 then --5 would be up left
+	elseif targetDirection == 5 then --5 would be up left
 		for j=1,2 do
-			if doorMovementX > doorMovementY then
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+			if movementX > movementY then
+				if math.random(1, movementX+movementY) < movementX then
 					newPosX = civilianArray[i][1] - 1
 				else
 					newPosY = civilianArray[i][2] - 1
@@ -847,48 +911,48 @@ function moveTowardsDoor ( i )
 			end
 		end
 		--correct so far
-	elseif doorDirection == 6 then --up right
+	elseif targetDirection == 6 then --up left
 		for j=1,2 do
-			if doorMovementX > doorMovementY then
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+			if movementX > movementY then
+				if math.random(1, movementX+movementY) < movementX then
 					newPosX = civilianArray[i][1] + 1
 				else
 					newPosY = civilianArray[i][2] - 1
 				end
 			else
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementY then
+				if math.random(1, movementX+movementY) < movementY then
 					newPosY = civilianArray[i][2] - 1
 				else
 					newPosX = civilianArray[i][1] + 1
 				end
 			end
 		end
-	elseif doorDirection == 9 then --down left
+	elseif targetDirection == 9 then --down left
 		for j=1,2 do
-			if doorMovementX > doorMovementY then
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+			if movementX > movementY then
+				if math.random(1, movementX+movementY) < movementX then
 					newPosX = civilianArray[i][1] - 1
 				else
 					newPosY = civilianArray[i][2] + 1
 				end
 			else
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementY then
+				if math.random(1, movementX+movementY) < movementY then
 					newPosY = civilianArray[i][2] + 1
 				else
 					newPosX = civilianArray[i][1] - 1
 				end
 			end
 		end
-	elseif doorDirection == 10 then --down right
+	elseif targetDirection == 10 then --down right
 		for j=1,2 do
-			if doorMovementX > doorMovementY then
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementX then
+			if movementX > movementY then
+				if math.random(1, movementX+movementY) < movementX then
 					newPosX = civilianArray[i][1] + 1
 				else
 					newPosY = civilianArray[i][2] + 1
 				end
 			else
-				if math.random(1, doorMovementX+doorMovementY) < doorMovementY then
+				if math.random(1, movementX+movementY) < movementY then
 					newPosY = civilianArray[i][2] + 1
 				else
 					newPosX = civilianArray[i][1] + 1
@@ -896,17 +960,23 @@ function moveTowardsDoor ( i )
 			end
 		end
 	end
+	targetDirection = 0
+	movementX = 0
+	movementY = 0
 end
 
-function checkWalls ( i, targetDoor )
-if targetDoor == true then
-	if newPosX ~= civilianArray[i][1] then --start with moving X axis and checking left and right walls
+function checkWalls ( i )
+	--first check doors
+	if 1==2 then
+		--!!temp
+	else
+		if newPosX ~= civilianArray[i][1] then --start with moving X axis and checking left and right walls
 			for k=1, roomCount do
 				if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then --check for right X wise
 					if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then --check for right wall Y wise
 						--wall is hit
 						newPosX = civilianArray[i][1] --stop civ from moving X wise
-						if civilianArray[i][2] > doorArray[doorTarget].y then --zombie is at least slightly above
+						if civilianArray[i][2] > zombieArray[civilianArray[i].target][2] then --zombie is at least slightly above
 							newPosY = newPosY + 1
 						else --!!nearest corner next
 							newPosY = newPosY - 1
@@ -927,7 +997,7 @@ if targetDoor == true then
 					if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then --check for left wall Y wise
 						--wall is hit
 						newPosX = civilianArray[i][1] --stop civ from moving X wise
-						if civilianArray[i][2] > doorArray[doorTarget].y then --zombie is at least slightly above
+						if civilianArray[i][2] > civilianArray[i].targetY then --zombie is at least slightly above
 							newPosY = newPosY + 1
 						else --!!nearest corner next
 							newPosY = newPosY - 1
@@ -953,18 +1023,18 @@ if targetDoor == true then
 					if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
 						newPosY = civilianArray[i][2] --stop movement that way
 					end
-					if civilianArray[i][1] > doorArray[doorTarget].x then --zombie is at least slightly above
+					if civilianArray[i][1] > zombieArray[civilianArray[i].target][1] then --zombie is at least slightly above
 						newPosX = newPosX + 1
 					else --!!nearest corner next
 						newPosX = newPosX - 1
 					end
 					--now just to make sure we didn't hit another wall
-					if (newPosX < rightWallArray[k][1]+5 and newPosY > rightWallArray[k][1]-5) then
+					if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
 						if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
 							newPosX = civilianArray[i][1]
 						end
 					end
-					if (newPosX < leftWallArray[k][1]+5 and newPosY > leftWallArray[k][1]-5) then
+					if (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then
 						if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
 							newPosX = civilianArray[i][1]
 						end
@@ -973,7 +1043,7 @@ if targetDoor == true then
 					if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
 						newPosY = civilianArray[i][2] --stop movement that way
 					end
-					if civilianArray[i][1] > doorArray[doorTarget].x then --zombie is at least slightly above
+					if civilianArray[i][1] > zombieArray[civilianArray[i].target][1] then --zombie is at least slightly above
 						newPosX = newPosX + 1
 					else --!!nearest corner next
 						newPosX = newPosX - 1
@@ -991,128 +1061,44 @@ if targetDoor == true then
 				end
 			end
 		end
-	else --check if we're running from a zombie
-		if newPosX ~= civilianArray[i][1] then --start with moving X axis and checking left and right walls
-		for k=1, roomCount do
-			if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then --check for right X wise
-				if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then --check for right wall Y wise
-					--wall is hit
-					newPosX = civilianArray[i][1] --stop civ from moving X wise
-					if civilianArray[i][2] > zombieArray[zombieTarget][2] then --zombie is at least slightly above
-						newPosY = newPosY + 1
-					else --!!nearest corner next
-						newPosY = newPosY - 1
-					end
-					--now just to make sure we didn't hit another wall
-					if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
-						if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
-							newPosY = civilianArray[i][2]
-						end
-					end
-					if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
-						if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
-							newPosY = civilianArray[i][2]
-						end
-					end
-				end
-			elseif (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then --check for left X wise
-				if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then --check for left wall Y wise
-					--wall is hit
-					newPosX = civilianArray[i][1] --stop civ from moving X wise
-					if civilianArray[i][2] > zombieArray[zombieTarget][2] then --zombie is at least slightly above
-						newPosY = newPosY + 1
-					else --!!nearest corner next
-						newPosY = newPosY - 1
-					end
-					--now just to make sure we didn't hit another wall
-					if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
-						if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
-							newPosY = civilianArray[i][2]
-						end
-					end
-					if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
-						if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
-							newPosY = civilianArray[i][2]
-						end
-					end
-				end	
-			end
-		end
-	end
-	if newPosY ~= civilianArray[i][2] then --check Y axis
-		for k=1, roomCount do
-			if (newPosY < upperWallArray[k][2]+5 and newPosY > upperWallArray[k][2]-5) then
-				if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
-					newPosY = civilianArray[i][2] --stop movement that way
-				end
-				if civilianArray[i][1] > zombieArray[zombieTarget][1] then --zombie is at least slightly above
-					newPosX = newPosX + 1
-				else --!!nearest corner next
-					newPosX = newPosX - 1
-				end
-				--now just to make sure we didn't hit another wall
-				if (newPosX < rightWallArray[k][1]+5 and newPosY > rightWallArray[k][1]-5) then
-					if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
-						newPosX = civilianArray[i][1]
-					end
-				end
-				if (newPosX < leftWallArray[k][1]+5 and newPosY > leftWallArray[k][1]-5) then
-					if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
-						newPosX = civilianArray[i][1]
-					end
-				end
-			elseif (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
-				if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
-					newPosY = civilianArray[i][2] --stop movement that way
-				end
-				if civilianArray[i][1] > zombieArray[zombieTarget][1] then --zombie is at least slightly above
-					newPosX = newPosX + 1
-				else --!!nearest corner next
-					newPosX = newPosX - 1
-				end
-				if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
-					if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
-						newPosX = civilianArray[i][1]
-					end
-				end
-				if (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then
-					if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
-						newPosX = civilianArray[i][1]
-					end
-				end
-			end
-		end
-	end
 	end
 end
 
 function moveAwayFromZombie ( i )
 	newPosX = civilianArray[i][1]
 	newPosY = civilianArray[i][2]
+	movementX = civilianArray[i][1]-civilianArray[i].targetX
+	movementY = civilianArray[i][2]-civilianArray[i].targetY
+	if movementX < 0 then
+		movementX = movementX*-1
+	end
+	if movementY < 0 then
+		movementY = movementY*-1
+	end
 	--first see if it's left or right
 	--target direction is 1 for left, 2 for right, 4 for up and 8 for down
 	--example, left and up would be 5	
-	if civilianArray[i][1] < zombieArray[zombieTarget][1] then
-		zombieDirection = zombieDirection + 2
-	elseif civilianArray[i][1] > zombieArray[zombieTarget][1] then
-		zombieDirection = zombieDirection + 1
+	if civilianArray[i][1] < zombieArray[civilianArray[i].target][1] then
+		targetDirection = targetDirection + 2
+	elseif civilianArray[i][1] > zombieArray[civilianArray[i].target][1] then
+		targetDirection = targetDirection + 1
 	end
 	--see if it's up or down
-	if civilianArray[i][2] < zombieArray[zombieTarget][2] then
-		zombieDirection = zombieDirection + 8
-	elseif civilianArray[i][2] > zombieArray[zombieTarget][2] then
-		zombieDirection = zombieDirection + 4
+	if civilianArray[i][2] < zombieArray[civilianArray[i].target][2] then
+		targetDirection = targetDirection + 8
+	elseif civilianArray[i][2] > zombieArray[civilianArray[i].target][2] then
+		targetDirection = targetDirection + 4
 	end	
 	--now we have the direction! now we move the OPPOSITE way
-	if zombieDirection == 1 then --zombie is to the left, move right !!or random up/down too
+	if targetDirection == 1 then --zombie is to the left, move right !!or random up/down too
 		newPosX = civilianArray[i][1] + 1
-	elseif zombieDirection == 2 then --zombie is to the right, move left !!or random up/down too
+	elseif targetDirection == 2 then --zombie is to the right, move left !!or random up/down too
 		newPosX = civilianArray[i][1] - 1
-	elseif zombieDirection == 4 then --guess
+	elseif targetDirection == 4 then --guess
 		newPosY = civilianArray[i][2] + 1
-	elseif zombieDirection == 8 then --guess
+	elseif targetDirection == 8 then --guess
 		newPosY = civilianArray[i][2] - 1
-	elseif zombieDirection == 5 then --5 would be up left
+	elseif targetDirection == 5 then --5 would be up left
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
@@ -1128,7 +1114,7 @@ function moveAwayFromZombie ( i )
 				end
 			end
 		end
-	elseif zombieDirection == 6 then --up right
+	elseif targetDirection == 6 then --up right
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
@@ -1144,7 +1130,7 @@ function moveAwayFromZombie ( i )
 				end
 			end
 		end
-	elseif zombieDirection == 9 then --down left
+	elseif targetDirection == 9 then --down left
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
@@ -1160,7 +1146,7 @@ function moveAwayFromZombie ( i )
 				end
 			end
 		end
-	elseif zombieDirection == 10 then --down right
+	elseif targetDirection == 10 then --down right
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
@@ -1177,146 +1163,163 @@ function moveAwayFromZombie ( i )
 			end
 		end
 	end
+	targetDirection = 0
+	movementX = 0
+	movementY = 0
 end
 
 function moveCivs( event )
 	--first check if there even are zombies
 	if zombieCount > 0 then
 		for i=1, #civilianArray do
-			hitDoor = false
 			if civilianArray[i].status == "bitten" then --first see if they're infected, because then they don't move
 					--do nothing
-			else --detect nearest zombie
-				for j=1,#zombieArray do
-					findClosestZombie ( i, j )
-				end
-				--now see if there's a door within range if the civ is outside
+			else 
 				if civilianArray[i].currentRoom == 0 then --find closest door
+					doorDist = 9999
 					for m=1,#doorArray do
 						findClosestDoor( i, m )
 					end
 				end
+				if doorDist < 6 then
+					civilianArray[i].targetDist = 9999
+					civilianArray[i].targetType = "none"
+					civilianArray[i].target = 0
+					civilianArray[i].targetX = 0
+					civilianArray[i].targetY = 0
+				end
+				for j=1,#zombieArray do
+					findClosestZombie ( i, j ) --detect nearest zombie
+				end	
+				print(civilianArray[i].targetType, doorDist)
 				--now we found the closest zombie and door. if zombie is more than 50 units away, then civilian won't move
-				if zombieDist > 50 then
-					--do nothing
-				elseif targetDoor == true then --move towards that door it saw
+				if civilianArray[i].targetDist > 50 then
+					civilianArray[i].targetType = "none"
+					civilianArray[i].target = 0
+					civilianArray[i].targetDist = 9999
+					civilianArray[i].targetX = 0
+					civilianArray[i].targetY = 0
+				elseif civilianArray[i].targetType == "door" then --move towards that door it saw
 					moveTowardsDoor( i )
 					--new direction set, check if the new positions hit a wall
-					checkWalls( i, targetDoor )
+					if doorDist > 10 then
+						checkWalls( i )
+					end
 					--this is where we move the civilians to the new positions
 					civilianArray[i][1] = newPosX
 					civilianArray[i][2] = newPosY
-				else
+				elseif civilianArray[i].targetType == "zombie" then
 					--find zombie direction and run away
 					moveAwayFromZombie( i )
 					--check if the new positions hit a wall
-					checkWalls( i, targetDoor )
+					if doorDist > 10 then
+						checkWalls( i )
+					end
 					--this is where we move the civilians to the new positions
 					civilianArray[i][1] = newPosX
 					civilianArray[i][2] = newPosY
 				end
 			end				
 		--and reset these variables too thanks
-		zombieDist = nil
-		zombieTarget = 0
-		zombieDirection = 0
-		doorDist = nil
-		doorTarget = 0
-		doorDirection = 0
-		targetDoor = false
+		targetDirection = 0
 		end
 	end
 end
 
 function findClosestCiv ( i, j )
-for j = 1, #civilianArray do
-	if civDist == nil then
-		civDist = 999999
-	end
-	--compare distances to all civilian actors			
-	distX = zombieArray[i][1]-civilianArray[j][1]
-	--no negative numbers please	
-	if distX < 0 then
-		distX = distX*-1
-	end
-	distY = zombieArray[i][2]-civilianArray[j][2]
-	--no negative numbers please
-	if distY < 0 then
-		distY = distY*-1
-	end
-	distanceArray[j] = distX + distY
-	--now check if this one's the closest
-	if distanceArray[j] < civDist then
-		civDist = distanceArray[j]
-		civTarget = j
-		movementX = distX
-		movementY = distY
-	end
-	distX = 0
-	milDistY = 0
+	for j = 1, #civilianArray do
+		--compare distances to all civilian actors			
+		distX = zombieArray[i][1]-civilianArray[j][1]
+		--no negative numbers please	
+		if distX < 0 then
+			distX = distX*-1
+		end
+		distY = zombieArray[i][2]-civilianArray[j][2]
+		--no negative numbers please
+		if distY < 0 then
+			distY = distY*-1
+		end
+		distanceArray[j] = distX + distY
+		--now check if this one's the closest
+		if distanceArray[j] < zombieArray[i].targetDist then
+			zombieArray[i].targetDist = distanceArray[j]
+			zombieArray[i].target = j
+			zombieArray[i].targetType = "civ"
+			zombieArray[i].targetX = civilianArray[j][1]
+			zombieArray[i].targetY = civilianArray[j][2]
+		end
 	end
 end
 
 function findClosestMil ( i, j )
-	if milDist == nil then
-		milDist = 999999
+	if zombieArray[i].targetDist == 0 then
+		zombieArray[i].targetDist = 9999
 	end
 	--compare distances to all military actors			
-	milDistX = zombieArray[i][1]-militaryArray[j][1]
+	DistX = zombieArray[i][1]-militaryArray[j][1]
 	--no negative numbers please	
-	if milDistX < 0 then
-		milDistX = milDistX*-1
+	if DistX < 0 then
+		DistX = DistX*-1
 	end
-	milDistY = zombieArray[i][2]-militaryArray[j][2]
+	DistY = zombieArray[i][2]-militaryArray[j][2]
 	--no negative numbers please
-	if milDistY < 0 then
-		milDistY = milDistY*-1
+	if DistY < 0 then
+		DistY = DistY*-1
 	end
-	milDistArray[j] = milDistX + milDistY
+	distanceArray[j] = DistX + DistY
 	--now check if this one's the closest
-	if milDistArray[j] < milDist then
-		milDist = milDistArray[j]
-		milTarget = j
-		movementX = milDistX
-		movementY = milDistY
+	if distanceArray[j] < zombieArray[i].targetDist then
+		zombieArray[i].targetDist = distanceArray[j]
+		zombieArray[i].target = j
+		zombieArray[i].targetType = "mil"
+		zombieArray[i].targetX = militaryArray[j][1]
+		zombieArray[i].targetY = militaryArray[j][2]
 	end
-	milDistX = 0
-	milDistY = 0
 end
 
 function moveTowardsCiv ( i )
-	if zombieArray[i][1] < civilianArray[civTarget][1] then
+	newPosX = zombieArray[i][1]
+	newPosY = zombieArray[i][2]
+	movementX = zombieArray[i][1]-zombieArray[i].targetX
+	movementY = zombieArray[i][2]-zombieArray[i].targetY
+	if movementX < 0 then
+		movementX = movementX*-1
+	end
+	if movementY < 0 then
+		movementY = movementY*-1
+	end
+	if zombieArray[i][1] < zombieArray[i].targetX then
 		targetDirection = targetDirection + 2
-	elseif zombieArray[i][1] > civilianArray[civTarget][1] then
+	elseif zombieArray[i][1] > zombieArray[i].targetX then
 		targetDirection = targetDirection + 1
 	end
 	--see if it's up or down
-	if zombieArray[i][2] > civilianArray[civTarget][2] then
+	if zombieArray[i][2] > zombieArray[i].targetY then
 		targetDirection = targetDirection + 4
-	elseif zombieArray[i][2] < civilianArray[civTarget][2] then
+	elseif zombieArray[i][2] < zombieArray[i].targetY then
 		targetDirection = targetDirection + 8
 	end
 	--now move up or down depending on targetDirection
 	if targetDirection == 1 then --it's left of the zombie, so move left
-		zombieArray[i][1] = zombieArray[i][1] - 1
+		newPosX = zombieArray[i][1] - 1
 	elseif targetDirection == 2 then --right of the zombie, move right
-		zombieArray[i][1] = zombieArray[i][1] + 1
+		newPosX = zombieArray[i][1] + 1
 	elseif targetDirection == 4 then --move up
-		zombieArray[i][2] = zombieArray[i][2] - 1
+		newPosY = zombieArray[i][2] - 1
 	elseif targetDirection == 5 then --up left
 		--see if it's further left than up
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				end
 			end
 		end
@@ -1325,33 +1328,33 @@ function moveTowardsCiv ( i )
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY ) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				end
 			end
 		end
 	elseif targetDirection == 8 then --DOWN NIGGA
-		zombieArray[i][2] = zombieArray[i][2] + 1
+		newPosY = zombieArray[i][2] + 1
 	elseif targetDirection == 9 then --down left
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				end
 			end
 		end			
@@ -1359,54 +1362,67 @@ function moveTowardsCiv ( i )
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				end
 			end
 		end
 	end
+	targetDirection = 0
+	movementX = 0
+	movementY = 0
 end
 
 function moveTowardsMil ( i )
-	if zombieArray[i][1] < militaryArray[milTarget][1] then
+	newPosX = zombieArray[i][1]
+	newPosY = zombieArray[i][2]
+	movementX = zombieArray[i][1]-zombieArray[i].targetX
+	movementY = zombieArray[i][2]-zombieArray[i].targetY
+	if movementX < 0 then
+		movementX = movementX*-1
+	end
+	if movementY < 0 then
+		movementY = movementY*-1
+	end
+	if zombieArray[i][1] < zombieArray[i].targetX then
 		targetDirection = targetDirection + 2
-	elseif zombieArray[i][1] > militaryArray[milTarget][1] then
+	elseif zombieArray[i][1] > zombieArray[i].targetX then
 		targetDirection = targetDirection + 1
 	end
 	--see if it's up or down
-	if zombieArray[i][2] > militaryArray[milTarget][2] then
+	if zombieArray[i][2] > zombieArray[i].targetY then
 		targetDirection = targetDirection + 4
-	elseif zombieArray[i][2] < militaryArray[milTarget][2] then
+	elseif zombieArray[i][2] < zombieArray[i].targetY then
 		targetDirection = targetDirection + 8
 	end
 	--now move up or down depending on targetDirection
 	if targetDirection == 1 then --it's left of the zombie, so move left
-		zombieArray[i][1] = zombieArray[i][1] - 1
+		newPosX = zombieArray[i][1] - 1
 	elseif targetDirection == 2 then --right of the zombie, move right
-		zombieArray[i][1] = zombieArray[i][1] + 1
+		newPosX = zombieArray[i][1] + 1
 	elseif targetDirection == 4 then --move up
-		zombieArray[i][2] = zombieArray[i][2] - 1
+		newPosY = zombieArray[i][2] - 1
 	elseif targetDirection == 5 then --up left
 		--see if it's further left than up
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				end
 			end
 		end
@@ -1415,33 +1431,33 @@ function moveTowardsMil ( i )
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY ) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] - 1
+					newPosY = zombieArray[i][2] - 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				end
 			end
 		end
 	elseif targetDirection == 8 then --DOWN NIGGA
-		zombieArray[i][2] = zombieArray[i][2] + 1
+		newPosY = zombieArray[i][2] + 1
 	elseif targetDirection == 9 then --down left
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] - 1
+					newPosX = zombieArray[i][1] - 1
 				end
 			end
 		end			
@@ -1449,15 +1465,206 @@ function moveTowardsMil ( i )
 		for j=1,2 do
 			if movementX > movementY then
 				if math.random(1, movementX+movementY) < movementX then
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
 				else
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				end
 			else
 				if math.random(1, movementX+movementY) < movementY then
-					zombieArray[i][2] = zombieArray[i][2] + 1
+					newPosY = zombieArray[i][2] + 1
 				else
-					zombieArray[i][1] = zombieArray[i][1] + 1
+					newPosX = zombieArray[i][1] + 1
+				end
+			end
+		end
+	end
+	targetDirection = 0
+	movementX = 0
+	movementY = 0
+end
+
+function checkWallsZed ( i )
+	if zombieArray[i].targetType == "civ" then --it's targetting a civ
+		if newPosX ~= zombieArray[i][1] then
+			for k=1, roomCount do
+				if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then --check for right X wise
+					if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then --check for right wall Y wise
+						--wall is hit
+						newPosX = zombieArray[i][1] --stop civ from moving X wise
+						if zombieArray[i][2] > civilianArray[zombieArray[i].target][2] then --zombie is at least slightly above
+							newPosY = newPosY - 1
+						else --!!nearest corner next
+							newPosY = newPosY + 1
+						end
+						--now just to make sure we didn't hit another wall
+						if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+							if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+						if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+							if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+					end
+				elseif (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then --check for left X wise
+					if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then --check for left wall Y wise
+						--wall is hit
+						newPosX = zombieArray[i][1] --stop civ from moving X wise
+						if zombieArray[i][2] > civilianArray[zombieArray[i].target][2] then --zombie is at least slightly above
+							newPosY = newPosY - 1
+						else --!!nearest corner next
+							newPosY = newPosY + 1
+						end
+						--now just to make sure we didn't hit another wall
+						if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+							if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+						if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+							if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+					end
+				end	
+			end
+		end
+		if newPosY ~= zombieArray[i][2] then --check Y axis
+			for k=1, roomCount do
+				if (newPosY < upperWallArray[k][2]+5 and newPosY > upperWallArray[k][2]-5) then
+					if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+						newPosY = zombieArray[i][2] --stop movement that way
+					end
+					if zombieArray[i][1] > civilianArray[zombieArray[i].target][1] then --zombie is at least slightly right
+						newPosX = newPosX - 1
+					else --!!nearest corner next
+						newPosX = newPosX + 1
+					end
+					--now just to make sure we didn't hit another wall
+					if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
+						if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+					if (newPosX < leftWallArray[k][1]+5 and newPosY > leftWallArray[k][1]-5) then
+						if (newPosX > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+				elseif (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+					if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+						newPosY = zombieArray[i][2] --stop movement that way
+					end
+					if zombieArray[i][1] > civilianArray[zombieArray[i].target][1] then --zombie is at least slightly right
+						newPosX = newPosX - 1
+					else --!!nearest corner next
+						newPosX = newPosX + 1
+					end
+					if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
+						if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+					if (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then
+						if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+				end
+			end
+		end
+	elseif zombieArray[i].targetType == "mil" then --targetting military
+		if newPosX ~= zombieArray[i][1] then
+			for k=1, roomCount do
+				if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then --check for right X wise
+					if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then --check for right wall Y wise
+						--wall is hit
+						newPosX = zombieArray[i][1] --stop civ from moving X wise
+						if zombieArray[i][2] > militaryArray[zombieArray[i].target][2] then --zombie is at least slightly above
+							newPosY = newPosY - 1
+						else --!!nearest corner next
+							newPosY = newPosY + 1
+						end
+						--now just to make sure we didn't hit another wall
+						if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+							if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+						if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+							if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+					end
+				elseif (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then --check for left X wise
+					if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then --check for left wall Y wise
+						--wall is hit
+						newPosX = zombieArray[i][1] --stop civ from moving X wise
+						if zombieArray[i][2] > militaryArray[zombieArray[i].target][2] then --zombie is at least slightly above
+							newPosY = newPosY - 1
+						else --!!nearest corner next
+							newPosY = newPosY + 1
+						end
+						--now just to make sure we didn't hit another wall
+						if (newPosY > upperWallArray[k][2]-5 and newPosY < upperWallArray[k][4]+5) then
+							if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+						if (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+							if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+								newPosY = zombieArray[i][2]
+							end
+						end
+					end
+				end	
+			end
+		end
+		if newPosY ~= zombieArray[i][2] then --check Y axis
+			for k=1, roomCount do
+				if (newPosY < upperWallArray[k][2]+5 and newPosY > upperWallArray[k][2]-5) then
+					if (newPosX < upperWallArray[k][3]+5 and newPosX > upperWallArray[k][1]-5) then
+						newPosY = zombieArray[i][2] --stop movement that way
+					end
+					if zombieArray[i][1] > militaryArray[zombieArray[i].target][1] then --zombie is at least slightly right
+						newPosX = newPosX - 1
+					else --!!nearest corner next
+						newPosX = newPosX + 1
+					end
+					--now just to make sure we didn't hit another wall
+					if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
+						if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+					if (newPosX < leftWallArray[k][1]+5 and newPosY > leftWallArray[k][1]-5) then
+						if (newPosX > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+				elseif (newPosY > lowerWallArray[k][2]-5 and newPosY < lowerWallArray[k][4]+5) then
+					if (newPosX < lowerWallArray[k][3]+5 and newPosX > lowerWallArray[k][1]-5) then
+						newPosY = zombieArray[i][2] --stop movement that way
+					end
+					if zombieArray[i][1] > militaryArray[zombieArray[i].target][1] then --zombie is at least slightly right
+						newPosX = newPosX - 1
+					else --!!nearest corner next
+						newPosX = newPosX + 1
+					end
+					if (newPosX < rightWallArray[k][1]+5 and newPosX > rightWallArray[k][1]-5) then
+						if (newPosY > rightWallArray[k][2]-5 and newPosY < rightWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
+					if (newPosX < leftWallArray[k][1]+5 and newPosX > leftWallArray[k][1]-5) then
+						if (newPosY > leftWallArray[k][2]-5 and newPosY < leftWallArray[k][4]+5) then
+							newPosX = zombieArray[i][1]
+						end
+					end
 				end
 			end
 		end
@@ -1477,45 +1684,90 @@ function moveZombies( event )
 			findClosestMil( i, j )
 		end
 		--see which is closer
-		if civDist == nil then
-			targetCiv = false
-		elseif milDist == nil then
-			targetCiv = true
-		elseif civDist < milDist then
-			targetCiv = true
-		end
-		if targetCiv == true then
+		if zombieArray[i].targetType == "civ" then
 			--now if we're within 5 units or so we'll set the zombie to infect the civilian on a timer and prevent him from moving
-			if distanceArray[civTarget] < 10 then --circle size is 5, so this is obviously 10 for some reason? will have to change with pinch and zoom
-				civilianArray[civTarget].status = "bitten"
+			if zombieArray[i].targetDist < 10 then --circle size is 5, so this is obviously 10 for some reason? will have to change with pinch and zoom
+				civilianArray[zombieArray[i].target].status = "bitten"
 				infectBool = true --infectBool just stops the dude from moving
 			end
 			if infectBool == true then --civ is being eaten
 				--do nothing
 			else
 				moveTowardsCiv( i )
+				checkWallsZed( i )
+				zombieArray[i][1] = newPosX
+				zombieArray[i][2] = newPosY
 			end
-		else --target military
-			if milDistArray[milTarget] < 10 then --circle size is 5, so this is obviously 10 for some reason? will have to change with pinch and zoom
-				militaryArray[milTarget].status = "bitten"
+		elseif zombieArray[i].targetType == "mil" then --target military
+			if zombieArray[i].targetDist < 10 then --circle size is 5, so this is obviously 10 for some reason? will have to change with pinch and zoom
+				if #militaryArray > 0 then
+					militaryArray[zombieArray[i].target].status = "bitten"
+					militaryArray[zombieArray[i].target].bittenBy = i
+				end
 				infectBool = true --infectBool just stops the dude from moving
 			end
 			if infectBool == true then --mil is being eaten
 				--do nothing
 			else
 				moveTowardsMil( i )
+				checkWallsZed( i )
+				zombieArray[i][1] = newPosX
+				zombieArray[i][2] = newPosY
 			end
+		else
+			--do nothing, everyone is dead
 		end
 		
 		--and reset these variables too thanks
-		civDist = nil
-		civTarget = 0
-		civDirection = 0
-		milDist = nil
-		milTarget = 0
-		targetDirection = 0
 		infectBool = false
-		targetCiv = false
+	end
+end
+
+function findClosestZombieMil ( i, j )
+	--compare distances to all zombie actors
+	distX = militaryArray[i][1]-zombieArray[j][1]
+	--no negative numbers please	
+	if distX < 0 then
+		distX = distX*-1
+	end
+	distY = militaryArray[i][2]-zombieArray[j][2]
+	--no negative numbers please
+	if distY < 0 then
+		distY = distY*-1
+	end
+	distanceArray[j] = distX + distY
+	--now we have the distance, see if it's the closest
+	if (distanceArray[j] < militaryArray[i].targetDist and zombieArray[j].currentRoom == militaryArray[i].currentRoom) then
+		militaryArray[i].targetDist = distanceArray[j]
+		militaryArray[i].target = j
+	end
+end
+
+function milFire ( i, j )
+	if zombieCount > 0 then
+		for i=1,#militaryArray do
+			if militaryArray[i].fireCounter >= 15 then
+			--find closest zombie
+				for j=1,#zombieArray do
+					findClosestZombieMil ( i, j )
+				end
+				zedTarget = militaryArray[i].target
+				if militaryArray[i].target > 0 then
+					milLines[i] = {militaryArray[i][1], militaryArray[i][2], zombieArray[militaryArray[i].target][1], zombieArray[militaryArray[i].target][2]}
+					if militaryArray[i].targetDist > 50 then --too far away, don't shoot
+						--do nothing
+					else --shoot the fucker
+						milLines[i].fire = 1
+						zombieArray[militaryArray[i].target].lifeLeft = zombieArray[militaryArray[i].target].lifeLeft - 10
+						if zombieArray[militaryArray[i].target].lifeLeft < 1 then --turn into zombie
+							killZombie( zedTarget )
+						end
+						militaryArray[i].fireCounter = 0
+					end
+				end
+			end
+			militaryArray[i].fireCounter = militaryArray[i].fireCounter + 1
+		end
 	end
 end
 
@@ -1524,11 +1776,11 @@ function renderOut()
 	achTime = constants.timePlayed + (tempTime - startTime)
 	--first clear your display
     for i=1, #world do
-        world[i]:removeSelf()
-        world[i]=nil
+			world[i]:removeSelf()
+			world[i]=nil
     end
 	--now check to see if the people are about to move
-	if moveCounter == 1	then --!! this is to see how many ticks we trigger this in or whatever
+	if moveCounter == 3	then --!! this is to see how many ticks we trigger this in or whatever
 		moveZombies()
 		eatCivs()
 		moveCounter = 0
@@ -1541,16 +1793,25 @@ function renderOut()
 	else
 		moveCounterCiv = moveCounterCiv + 1
 	end
-	
+	--now military needs to fire
+	milFire()
 	--!!temporary random spawns for infinity mode
 	if constants.currentLevel == 11 then
 		if infCounter == randomSpawn then
 			spawnRandom()
 			infCounter = 0
 			randomSpawn = math.random(30, 150)
-			print("next zombie in: ", randomSpawn)
+			print("next civ in: ", randomSpawn)
 		else
 			infCounter = infCounter + 1
+		end
+		if milCounter == randomMilSpawn then
+			spawnRandomMil()
+			milCounter = 0
+			randomMilSpawn = math.random(60, 300)
+			print("next soldier in: ", randomMilSpawn)
+		else
+			milCounter = milCounter + 1
 		end
 	end
 		
@@ -1583,16 +1844,35 @@ function renderOut()
 		print("upper wall", upperWallArray[1][1], upperWallArray[1][2], upperWallArray[1][3], upperWallArray[1][4], upperWallArray[1][5], upperWallArray[i].room)
 		print("lower wall", lowerWallArray[1][1], lowerWallArray[1][2], lowerWallArray[1][3], lowerWallArray[1][4], lowerWallArray[1][5], lowerWallArray[i].room)]]--
     end
+	
 	--add the doors
-	for i=1,doorCount do
+	for i=1,doorCount do	
 		if doorType[i] == "V" then --draw a vertical door
 			doorArray[i] = display.newRect(doorX[i], doorY[i], 5, 20)
+			doorArray[i].room = doorRoom[i]
+			for j=1, roomCount do
+				
+				if (doorArray[i].x == leftWallArray[j][1] and doorArray[i].room == leftWallArray[j].room) then
+					doorArray[i].wall = "left"
+				end
+				if doorArray[i].x == rightWallArray[j][1] and doorArray[i].room == rightWallArray[j].room then
+					doorArray[i].wall = "right"
+				end
+			end
 		else --draw a horizontal door
 			doorArray[i] = display.newRect(doorX[i], doorY[i], 20, 5)
+			doorArray[i].room = doorRoom[i]
+			for j=1, roomCount do
+				if (doorArray[i].y == upperWallArray[j][2] and doorArray[i].room == upperWallArray[j].room) then
+					doorArray[i].wall = "upper"
+				end
+				if doorArray[i].y == lowerWallArray[j][2] and doorArray[i].room == lowerWallArray[j].room then
+					doorArray[i].wall = "lower"
+				end
+			end
 		end
 		doorArray[i].strokeWidth = 0
 		doorArray[i]:setFillColor( 0.6, 0.25, 0 )
-		doorArray[i].room = doorRoom[i]
 		table.insert(world,doorArray[i])
 	end
 	
@@ -1611,7 +1891,6 @@ function renderOut()
 				end
 			end
 		end
-		--print("civ in room", civilianArray[i].currentRoom, i)
 	end
 	
 	--give us some zombies nigga
@@ -1619,7 +1898,7 @@ function renderOut()
 		zombieCircles[i] = display.newCircle(zombieArray[i][1], zombieArray[i][2],5)
 		zombieCircles[i]:setFillColor( 0.8, 0, 0, 0.8 )
 		--!!temp added click to kill a zombie to test victory conditions
-		zombieCircles[i]:addEventListener( "tap", killZombie )
+		zombieCircles[i]:addEventListener( "tap", clickZombie )
 		zombieCircles[i].arrayNumber = i
 		zombieArray[i].currentRoom = 0
 		table.insert(world,zombieCircles[i])
@@ -1630,7 +1909,6 @@ function renderOut()
 				end
 			end
 		end
-	--print("zombie in room", zombieArray[i].currentRoom, i)
 	end
 	
 	--and some military
@@ -1638,7 +1916,7 @@ function renderOut()
 		milCircles[i] = display.newCircle(militaryArray[i][1], militaryArray[i][2],5)
 		milCircles[i]:setFillColor( 0, 0.5, 0.5, 0.8 )
 		milCircles[i].arrayNumber = i
-		milCircles[i].currentRoom = 0
+		militaryArray[i].currentRoom = 0
 		table.insert(world,milCircles[i])
 		for j=1,#roomArray do
 			if (militaryArray[i][1] > roomArray[j][1] and militaryArray[i][1] < roomArray[j][1]+roomArray[j][4]) then --military is within x of room
@@ -1648,10 +1926,16 @@ function renderOut()
 			end
 		end
 		if constants.rangeOn == "Indicator On" then
-			milRangeCircles[i] = display.newCircle(militaryArray[i][1], militaryArray[i][2],50)
+			milRangeCircles[i] = display.newCircle(militaryArray[i][1], militaryArray[i][2],45)
 			milRangeCircles[i]:setFillColor( 0.5, 0.5, 0.5, 0.2 )
 			milRangeCircles[i].arrayNumber = i
 			table.insert(world,milRangeCircles[i])
+		end
+		if milLines[i].fire == 1 then
+			milLines[i] = display.newLine( milLines[i][1], milLines[i][2], milLines[i][3], milLines[i][4] )
+			milLines[i]:setStrokeColor( 0, 0, 0 )
+			table.insert(world,milLines[i])
+			milLines[i].fire = 0
 		end
 	end
 	--add the click counter
@@ -1740,7 +2024,7 @@ function endScene()
 	constants.totalLost = constants.totalLost + tempLost
 	constants.gamesPlayed = constants.gamesPlayed + 1
 	constants.timePlayed = constants.timePlayed + constants.levelTime
-	constants.totalMilInfections = constants.milInfected + tempMilInfected
+	constants.totalMilInfections = constants.totalMilInfections + tempMilInfected
 	tempLost = 0
 	tempInfected = 0
 	tempMilInfected = 0
@@ -1769,24 +2053,30 @@ function scene:show( event )
 		for i=1,#civilianArray do
 			civilianArray[i].lifeLeft = constants.civHealth
 			civilianArray[i].status = "healthy"
+			civilianArray[i].targetType = "none"
+			civilianArray[i].target = 0
+			civilianArray[i].targetDist = 9999
 		end
 		for i=1,#militaryArray do
 			militaryArray[i].lifeLeft = constants.milHealth
 			militaryArray[i].status = "healthy"
+			militaryArray[i].fireCounter = 0
+			militaryArray[i].targetDist = 9999
+			militaryArray[i].targetType = "none"
+			milLines[i].fire = 0
 		end
 		display.setDefault( "background", 0, 0, 0 )
 		zombieCount = 0
 		startTime = system.getTimer()
+		achInfections = tonumber(constants.totalInfections)
+		achMilInfections = tonumber(constants.totalMilInfections)
+		achLost = tonumber(constants.totalLost)
         --"did" fires when the scene is FULLY on the screen.
     elseif ( phase == "did" ) then
         --start runtime listeners like "enterFrame"
         --start timers, transitions, sprite animations.
         Runtime:addEventListener( "enterFrame" , renderOut)
         Runtime:addEventListener( "touch" , moveWorld)
-        --add runtime listeners for everything in world
-        --[[for i=1,#world do
-            world[i]:addEventListener("touch",getInfo)
-        end]]--
 		zombieArray = {}
 		print("Scrollspeed: ",constants.scrollSpeed)
 		print("Level: ",constants.currentLevel)
@@ -1835,6 +2125,9 @@ function scene:hide( event )
 	end
 	for i=1,#doorArray do
 		table.remove(doorArray)
+	end
+	for i=1,#milLines do
+		table.remove(milLines)
 	end
 	elseif ( phase == "did" ) then
         --not much to do here, except force removal of the scene after it transitions of screen for optimization.

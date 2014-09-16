@@ -5,7 +5,7 @@ local widget = require( "widget" )
 local menuLoop, menuLoopChannel, title
 local scrollView
 local achPage = 1
-local achLocation = {0, -480}
+local achLocation = {0, -480, -960}
 local imageArray = {}
 local achPic = {}
 local achieveCount = constants.achCount
@@ -95,16 +95,18 @@ local xScroll
 		xScroll=((event.xStart-event.x))
 	end
 	if ( "ended" == event.phase ) then
+		print(xScroll)
 		if xScroll > 100 then --we went right i think
 			achPage = achPage + 1
 		elseif xScroll < -100 then --we went left
 			achPage = achPage - 1
 		end
+		print(achPage)
 		if achPage < 1 then
 			achPage = 1
 		end
-		if achPage > 2 then
-			achPage = 2
+		if achPage > 3 then
+			achPage = 3
 		end
 		scrollView:scrollToPosition
 		{
@@ -156,7 +158,7 @@ scrollView = widget.newScrollView
 	listener = scrollListener,
 	backgroundColor = { 1, 1, 1 }
 }
-scrollView:setScrollWidth( display.contentWidth*2 )
+scrollView:setScrollWidth( display.contentWidth*3 )
 
 	for i=1,achieveCount do
 		imageArray[i] = "crown.png" --!!add different pics for different achievements later
@@ -183,6 +185,21 @@ scrollView:setScrollWidth( display.contentWidth*2 )
 			temp = temp + 1
 			if temp < (achieveCount + 1) then
 				achPic[temp] = display.newImage(imageArray[temp], (xColumn*column)+display.contentWidth, (xRow*row))
+				achPic[temp].name = temp
+				achPic[temp]:addEventListener( "tap", clickAchievement )
+				scrollView:insert(achPic[temp])
+				if constants.achUnlocked[temp] == "false" then
+					achPic[temp].alpha = 0.4
+				end
+			end
+		end
+	end
+	--page 3
+	for row=1,4 do
+		for column=1,5 do
+			temp = temp + 1
+			if temp < (achieveCount + 1) then
+				achPic[temp] = display.newImage(imageArray[temp], (xColumn*column)+display.contentWidth*2, (xRow*row))
 				achPic[temp].name = temp
 				achPic[temp]:addEventListener( "tap", clickAchievement )
 				scrollView:insert(achPic[temp])
@@ -242,7 +259,6 @@ function scene:hide( event )
 		--not much to do here, except force removal of
 		--the scene after it transitions of screen for optimization.
     end
-    
 end
 
 function scene:destroy( event )

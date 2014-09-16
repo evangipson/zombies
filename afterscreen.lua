@@ -5,56 +5,57 @@ local widget = require( "widget" )
 local endText, timeText, milText
 local isUnlocked = 0
 local displayAchievement = false
+local achTimer
 
 --==============
 --USER FUNCTIONS
 --==============
 function checkAchievements ( event )
-	if (constants.victory == 1 and constants.currentLevel == 1 and constants.levelCleared[2] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 1 and constants.achUnlocked[1] == "false") then
 		constants.achUnlocked[1] = "true"
 		isUnlocked = 1
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 2 and constants.levelCleared[3] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 2 and constants.achUnlocked[2] == "false") then
 		constants.achUnlocked[2] = "true"
 		isUnlocked = 2
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 3 and constants.levelCleared[4] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 3 and constants.achUnlocked[3] == "false") then
 		constants.achUnlocked[3] = "true"
 		isUnlocked = 3
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 4 and constants.levelCleared[5] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 4 and constants.achUnlocked[4] == "false") then
 		constants.achUnlocked[4] = "true"
 		isUnlocked = 4
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 5 and constants.levelCleared[6] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 5 and constants.achUnlocked[5] == "false") then
 		constants.achUnlocked[5] = "true"
 		isUnlocked = 5
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 6 and constants.levelCleared[7] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 6 and constants.achUnlocked[6] == "false") then
 		constants.achUnlocked[6] = "true"
 		isUnlocked = 6
 	end
-	if (constants.victory == 1 and constants.currentLevel == 7 and constants.levelCleared[8] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 7 and constants.achUnlocked[7] == "false") then
 		constants.achUnlocked[7] = "true"
 		isUnlocked = 7
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 8 and constants.levelCleared[9] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 8 and constants.achUnlocked[8] == "false") then
 		constants.achUnlocked[8] = "true"
 		isUnlocked = 8
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 9 and constants.levelCleared[10] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 9 and constants.achUnlocked[9] == "false") then
 		constants.achUnlocked[9] = "true"
 		isUnlocked = 9
 		constants.level6achCleared = 0
 	end
-	if (constants.victory == 1 and constants.currentLevel == 10 and constants.levelCleared[11] == "false") then
+	if (constants.victory == 1 and constants.currentLevel == 10 and constants.achUnlocked[10] == "false") then
 		constants.achUnlocked[10] = "true"
 		isUnlocked = 10
 		constants.level6achCleared = 0
@@ -67,6 +68,31 @@ function checkAchievements ( event )
 			isUnlocked = 39
 		end
 	end
+	--check for games played achievements
+	if (constants.gamesPlayed == 1 and constants.achUnlocked[40] == "false") then
+		constants.achUnlocked[40] = "true"
+		isUnlocked = 40
+	end
+	if (constants.gamesPlayed == 10 and constants.achUnlocked[41] == "false") then
+		constants.achUnlocked[41] = "true"
+		isUnlocked = 41
+	end
+	if (constants.gamesPlayed == 50 and constants.achUnlocked[42] == "false") then
+		constants.achUnlocked[42] = "true"
+		isUnlocked = 42
+	end
+	if (constants.gamesPlayed == 100 and constants.achUnlocked[43] == "false") then
+		constants.achUnlocked[43] = "true"
+		isUnlocked = 43
+	end
+	if (constants.gamesPlayed == 250 and constants.achUnlocked[44] == "false") then
+		constants.achUnlocked[44] = "true"
+		isUnlocked = 44
+	end
+	if (constants.gamesPlayed == 500 and constants.achUnlocked[45] == "false") then
+		constants.achUnlocked[45] = "true"
+		isUnlocked = 45
+	end
 	if isUnlocked > 0 then
 		achPopUp( isUnlocked )
 	end
@@ -75,20 +101,50 @@ end
 function achPopUp ( isUnlocked )
 	displayAchievement = true
 	achievementText = "Achievement unlocked!\n"..constants.achArray[isUnlocked]
-	timer.performWithDelay( 3000, achPopDown )
+	achTimer = timer.performWithDelay( 3000, achPopDown )
 end
 
 function achPopDown ( event )
-	displayAchievement = false
-	achRect:removeSelf()
-	tempAchText:removeSelf()
+	if (displayAchievement == true and achRect ~= nil) then
+		displayAchievement = false
+		achRect:removeSelf()
+		tempAchText:removeSelf()
+	end
 end
 
-local function handleMenuEvent( event )
+function handleMenuEvent( event )
     if ( "ended" == event.phase ) then
         -- Assumes that "menu.lua" exists and is configured as a Composer scene
 		--have to do something with that shit here
+		constants.currentLevel = 0
+		if displayAchievement == true then
+			timer.cancel( achTimer )
+			achRect:removeSelf()
+			tempAchText:removeSelf()
+			displayAchievement = false
+		end
 		composer.gotoScene( "menu" )
+    end
+	return true
+end
+
+function handleContinueEvent( event )
+    if ( "ended" == event.phase ) then
+		if constants.victory == 1 then
+			constants.currentLevel = constants.currentLevel + 1
+			if constants.currentLevel > 11 then
+				constants.currentLevel = 11
+			end
+		end
+        -- Assumes that "menu.lua" exists and is configured as a Composer scene
+		--have to do something with that shit here
+		if displayAchievement == true then
+			timer.cancel( achTimer )
+			achRect:removeSelf()
+			tempAchText:removeSelf()
+			displayAchievement = false
+		end
+		composer.gotoScene( "game" )
     end
 	return true
 end
@@ -166,6 +222,23 @@ function scene:show( event )
 	--update stats
 	saveSettings()
 	
+	continueButton = widget.newButton
+	{
+		label = "Main Menu",
+		onEvent = handleContinueEvent,
+		emboss = false,
+		--properties for a rounded rectangle button...
+		shape="roundedRect",
+		width = 200,
+		height = 40,
+		font = native.systemFont,
+		cornerRadius = 10,
+		fillColor = { default={ 0.8, 0.8, 0.8, 1 }, over={ 0.4, 0.4, 0.4, 0.4 } },
+		strokeColor = { default={ 0, 0, 0, 1 }, over={ 0, 0, 0, 1 } },
+		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
+		strokeWidth = 2
+	}
+	
 	menuButton = widget.newButton
 	{
 		label = "Main Menu",
@@ -182,10 +255,16 @@ function scene:show( event )
 		labelColor = { default={ 0, 0, 0 }, over={ 0, 0, 0, 0.5 } },
 		strokeWidth = 2
 	}
-		
+		if constants.victory == 1 then
+			continueButton:setLabel("Next level")
+		else
+			continueButton:setLabel("Retry")
+		end
 		--center buttons
+		continueButton.x = display.contentCenterX
+		continueButton.y = display.contentCenterY+60
 		menuButton.x = display.contentCenterX
-		menuButton.y = display.contentCenterY+80
+		menuButton.y = display.contentCenterY+120
 	
 	if displayAchievement == true then
 		achRect = display.newRect(display.contentCenterX, display.contentHeight-25, 250, 40)
@@ -225,18 +304,13 @@ function scene:hide( event )
 		--unallocate timers, transitions, sprite stuff.
 		menuButton:removeSelf()
 		endText:removeSelf()
-		constants.currentLevel = 0
 		timeText:removeSelf()
 		infText:removeSelf()
 		milText:removeSelf()
 		lostText:removeSelf()
+		continueButton:removeSelf()
 		constants.civsInfected = 0		
 		constants.zombiesLost = 0
-		if displayAchievement == true then
-			achRect:removeSelf()
-			tempAchText:removeSelf()
-			displayAchievement = false
-		end
 		--clean up audio variables
 		--audio.stop(menuLoopChannel)
 		--audio.dispose(menuLoop)

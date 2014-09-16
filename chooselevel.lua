@@ -93,6 +93,7 @@ function scene:show( event )
 	title = display.newText("Choose level", display.contentCenterX, display.contentCenterY-(display.contentHeight/2)+40, native.systemFont, 16 )
 	title:setFillColor( 0, 0, 0)
 	--add infinite mode pic
+	constants.levelCleared[11] = "true" --!!temp so infinite mode is always available
 	levelpic[12] = display.newImage(imageArray[12], display.contentCenterX, display.contentCenterY)
 	nameArray[12] = display.newText(levelTitle[12], display.contentCenterX, display.contentCenterY+80, native.systemFont, 16 )
 	nameArray[12]:setFillColor( 0, 0, 0)

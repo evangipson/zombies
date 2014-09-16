@@ -43,10 +43,10 @@ rtn.level0DoorX={75, 75, 200, 200, 425}
 rtn.level0DoorY={75, 95, 100, 150, 295}
 rtn.level0DoorType={"H", "H", "V", "V", "V"}
 rtn.level0DoorRoom={1, 2, 3, 3, 4}
-rtn.level0CivX={60, 80, 100, 120, 140, 60, 80, 100, 120, 140, 60, 80, 100, 120, 140, 60, 80, 100, 120, 140}
-rtn.level0CivY={60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 120, 120, 120, 120, 120}
-rtn.level0MilX={100}
-rtn.level0MilY={100}
+rtn.level0CivX={60}
+rtn.level0CivY={60}
+rtn.level0MilX={}
+rtn.level0MilY={}
 rtn.level0Zombies = 4
 
 --level 1
@@ -61,11 +61,11 @@ rtn.level1DoorX={75}
 rtn.level1DoorY={50}
 rtn.level1DoorType={"H"}
 rtn.level1DoorRoom={1}
-rtn.level1CivX={120, 120}
-rtn.level1CivY={60, 100}
-rtn.level1MilX={100}
-rtn.level1MilY={100}
-rtn.level1Zombies = 1
+rtn.level1CivX={80, 130}
+rtn.level1CivY={30, 30}
+rtn.level1MilX={}
+rtn.level1MilY={}
+rtn.level1Zombies = 2
 
 --level 2
 rtn.level2RoomCount = 1
@@ -79,8 +79,8 @@ rtn.level2DoorX={50}
 rtn.level2DoorY={50}
 rtn.level2DoorType={"V"}
 rtn.level2DoorRoom={1}
-rtn.level2CivX={60, 80}
-rtn.level2CivY={60, 60}
+rtn.level2CivX={80, 120, 100}
+rtn.level2CivY={120, 80, 120}
 rtn.level2MilX={100}
 rtn.level2MilY={100}
 rtn.level2Zombies = 2
@@ -244,13 +244,13 @@ rtn.level11DoorType={"V", "V", "V", "V", "H", "H", "H", "H"}
 rtn.level11DoorRoom={1, 1, 1, 1, 1, 1, 1, 1}
 rtn.level11CivX={100, 50}
 rtn.level11CivY={100, 50}
-rtn.level11MilX={100}
-rtn.level11MilY={100}
+rtn.level11MilX={}
+rtn.level11MilY={}
 rtn.level11Zombies = 100
 
 --achievement constants
 rtn.achUnlocked = {}
-rtn.achCount = 39
+rtn.achCount = 45
 rtn.achArray = {}
 rtn.achArrayDesc = {}
 rtn.achSecret = {}
@@ -340,4 +340,18 @@ rtn.achArray[39] = "The number of the beast"
 rtn.achArrayDesc[39] = "Complete level 6 three times in a row"
 rtn.achSecret[39] = 1
 rtn.level6achCleared = 0
+
+rtn.achArray[40] = "I hope you like it!"
+rtn.achArrayDesc[40] = "Play one game of InfectZen."
+rtn.achArray[41] = "It seems you do..."
+rtn.achArrayDesc[41] = "Play 10 games of InfectZen."
+rtn.achArray[42] = "Getting bored yet?"
+rtn.achArrayDesc[42] = "Play 50 games of InfectZen."
+rtn.achArray[43] = "Crossing the Styx"
+rtn.achArrayDesc[43] = "Play 100 games of InfectZen."
+rtn.achArray[44] = "God of the Underworld"
+rtn.achArrayDesc[44] = "Play 250 games of InfectZen."
+rtn.achArray[45] = "Go do something else now"
+rtn.achArrayDesc[45] = "Play 500 games of InfectZen."
+
 return rtn

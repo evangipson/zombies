@@ -257,9 +257,27 @@ local function loadGame()
 			constants.achUnlocked[39] = line
 		end
 		if lineNumber == 58 then
-			constants.totalMilInfections = line
+			constants.achUnlocked[40] = line
 		end
 		if lineNumber == 59 then
+			constants.achUnlocked[41] = line
+		end
+		if lineNumber == 60 then
+			constants.achUnlocked[42] = line
+		end
+		if lineNumber == 61 then
+			constants.achUnlocked[43] = line
+		end
+		if lineNumber == 62 then
+			constants.achUnlocked[44] = line
+		end
+		if lineNumber == 63 then
+			constants.achUnlocked[45] = line
+		end
+		if lineNumber == 64 then
+			constants.totalMilInfections = line
+		end
+		if lineNumber == 65 then
 			constants.rangeOn = line
 		end
 		lineNumber = lineNumber + 1
